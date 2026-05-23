@@ -919,7 +919,7 @@ ${finalCanvasSize} 相当の横長キャンバスに、${size} 相当の独立�
 
     await navigator.clipboard.writeText(prompt);
 
-    window.open("https://chatgpt.com/", "_blank", "noopener,noreferrer");
+    window.open("https://chat.openai.com/", "_blank", "noopener,noreferrer");
 
     setTimeout(() => {
       setLoading(false);

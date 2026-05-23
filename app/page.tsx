@@ -971,7 +971,7 @@ ${finalCanvasSize} 相当の横長キャンバスに、${size} 相当の独立�
               </button>
 
               <a
-  href="https://chatgpt.com/"
+  href="https://chatgpt.com/?hints=search"
   target="_blank"
   rel="noopener noreferrer"
   onMouseDown={openChatGPT}

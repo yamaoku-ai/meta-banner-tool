@@ -977,7 +977,7 @@ ${finalCanvasSize} 相当の横長キャンバスに、${size} 相当の独立�
   onMouseDown={openChatGPT}
   className="rounded-xl bg-blue-600 px-4 py-2 text-sm font-bold text-white shadow-sm hover:bg-blue-700"
 >
-  バナーを作る
+  ChatGPTを開く
 </a>
 
               <button onClick={() => setDarkMode(!darkMode)} className={`rounded-xl border px-3 py-2 ${darkMode ? "border-zinc-700 bg-zinc-800" : "border-gray-200 bg-white"}`}>

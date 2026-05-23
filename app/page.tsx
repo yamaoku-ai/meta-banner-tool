@@ -916,19 +916,12 @@ ${finalCanvasSize} 相当の横長キャンバスに、${size} 相当の独立�
   const openChatGPT = async () => {
   try {
     setLoading(true);
-
     await navigator.clipboard.writeText(prompt);
-
-    window.open("https://chatgpt.com/", "_blank");
-
-    setTimeout(() => {
-      setLoading(false);
-      alert("プロンプトをコピーしました。\n開いたChatGPTに貼り付けてください。");
-    }, 500);
+    setLoading(false);
   } catch (error) {
     setLoading(false);
-    alert("コピーに失敗しました。ブラウザ設定を確認してください。");
     console.error(error);
+    alert("コピーに失敗しました。プロンプトタブから手動コピーしてください。");
   }
 };
 
@@ -975,9 +968,9 @@ ${finalCanvasSize} 相当の横長キャンバスに、${size} 相当の独立�
                 コピー
               </button>
 
-              <button onClick={openChatGPT} className="rounded-xl bg-blue-600 px-4 py-2 text-sm font-bold text-white shadow-sm hover:bg-blue-700">
+              <a href="https://chatgpt.com/" target="_blank" rel="noreferrer" onClick={openChatGPT} className="rounded-xl bg-blue-600 px-4 py-2 text-sm font-bold text-white shadow-sm hover:bg-blue-700">
                 バナーを作る
-              </button>
+              </a>
 
               <button onClick={() => setDarkMode(!darkMode)} className={`rounded-xl border px-3 py-2 ${darkMode ? "border-zinc-700 bg-zinc-800" : "border-gray-200 bg-white"}`}>
                 {darkMode ? <Sun size={18} /> : <Moon size={18} />}

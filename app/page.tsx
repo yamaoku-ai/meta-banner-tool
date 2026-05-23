@@ -914,43 +914,42 @@ ${finalCanvasSize} 相当の横長キャンバスに、${size} 相当の独立�
   };
 
   const openChatGPT = () => {
-  try {
-    setLoading(true);
+  setLoading(true);
 
-    const newWindow = window.open(
-      "https://chatgpt.com/",
-      "_blank"
-    );
+  const newWindow = window.open(
+    "https://chatgpt.com/",
+    "_blank"
+  );
 
-    if (!newWindow || newWindow.closed || typeof newWindow.closed === "undefined") {
-      alert("ポップアップがブロックされています。ブラウザで許可してください。");
+  navigator.clipboard
+    .writeText(prompt)
+    .then(() => {
       setLoading(false);
-      return;
-    }
 
-    navigator.clipboard
-      .writeText(prompt)
-      .then(() => {
-        setLoading(false);
+      if (newWindow) {
+        alert(
+          "プロンプトをコピーしました。\n開いたChatGPTに貼り付けてください。"
+        );
+        return;
+      }
 
-        setTimeout(() => {
-          alert("プロンプトをコピーしました。\n開いたChatGPTに貼り付けてください。");
-        }, 300);
-      })
-      .catch(() => {
-        setLoading(false);
+      alert(
+        "プロンプトをコピーしました。\nChatGPTが開かない場合はブラウザ設定を確認してください。"
+      );
+    })
+    .catch(() => {
+      setLoading(false);
 
-        alert("ChatGPTは開きましたが、コピーに失敗しました。");
-      });
-  } catch (error) {
-    console.error(error);
+      if (newWindow) {
+        alert(
+          "ChatGPTは開きましたが、コピーに失敗しました。"
+        );
+        return;
+      }
 
-    setLoading(false);
-
-    alert("ChatGPTを開けませんでした。");
-  }
-};
-
+      alert("ChatGPTを開けませんでした。");
+    });
+  };
   const deleteHistoryItem = (id: number) => {
     const ok = confirm("この保存データを削除しますか？");
     if (!ok) return;

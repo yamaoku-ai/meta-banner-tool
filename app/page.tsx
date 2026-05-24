@@ -39,6 +39,19 @@ import "react-circular-progressbar/dist/styles.css";
 
 type BannerSize = "1080×1080" | "1200×628" | "1080×1920";
 
+type CampaignType =
+  | "商品販売"
+  | "店舗集客"
+  | "求人"
+  | "サービス申込"
+  | "リード獲得"
+  | "LINE登録"
+  | "資料請求"
+  | "アプリDL"
+  | "ブランド認知"
+  | "イベント"
+  | "その他";
+
 type AdType =
   | "CV重視"
   | "CTR重視"
@@ -66,8 +79,7 @@ type DesignCount =
   | "6枚"
   | "7枚"
   | "8枚"
-  | "9枚"
-  | "10枚";
+  | "9枚";
 
 type CopyTone =
   | "強め"
@@ -96,10 +108,25 @@ type SavedHistory = {
   product: string;
   target: string;
   appeal: string;
+  campaignType: CampaignType;
   adType: AdType;
   createdAt: string;
   prompt: string;
 };
+
+const CAMPAIGN_TYPES: CampaignType[] = [
+  "商品販売",
+  "店舗集客",
+  "求人",
+  "サービス申込",
+  "リード獲得",
+  "LINE登録",
+  "資料請求",
+  "アプリDL",
+  "ブランド認知",
+  "イベント",
+  "その他",
+];
 
 const DESIGN_COUNTS: DesignCount[] = [
   "1枚",
@@ -111,7 +138,6 @@ const DESIGN_COUNTS: DesignCount[] = [
   "7枚",
   "8枚",
   "9枚",
-  "10枚",
 ];
 
 const COPY_TONES: CopyTone[] = [
@@ -238,6 +264,7 @@ export default function Home() {
   const [color, setColor] = useState("");
   const [memo, setMemo] = useState("");
 
+  const [campaignType, setCampaignType] = useState<CampaignType>("商品販売");
   const [adType, setAdType] = useState<AdType>("CV重視");
   const [language, setLanguage] = useState<Language>("日本語");
   const [size, setSize] = useState<BannerSize>("1080×1080");
@@ -264,8 +291,21 @@ export default function Home() {
 
   const finalCanvasSize = useMemo(() => {
     const current = SIZE_MAP[size];
-    return `${current.width * selectedDesignCount}×${current.height}`;
+
+    if (selectedDesignCount <= 3) {
+      return `${current.width * selectedDesignCount}×${current.height}`;
+    }
+
+    const columns = 3;
+    const rows = Math.ceil(selectedDesignCount / columns);
+
+    return `${current.width * columns}×${current.height * rows}`;
   }, [size, selectedDesignCount]);
+
+  const layoutInstruction = useMemo(() => {
+    if (selectedDesignCount <= 3) return "横1列";
+    return "3列グリッド";
+  }, [selectedDesignCount]);
 
   const panel = darkMode
     ? "border-zinc-800 bg-zinc-900 text-white"
@@ -279,15 +319,107 @@ export default function Home() {
     ? "bg-zinc-950 text-white"
     : "bg-[#F5F6F8] text-gray-900";
 
+  const campaignCta = useMemo(() => {
+    if (campaignType === "求人") return "応募する";
+    if (campaignType === "店舗集客") return "予約する";
+    if (campaignType === "商品販売") return "今すぐ購入";
+    if (campaignType === "サービス申込") return "申し込む";
+    if (campaignType === "リード獲得") return "無料相談する";
+    if (campaignType === "LINE登録") return "LINEで受け取る";
+    if (campaignType === "資料請求") return "資料を見る";
+    if (campaignType === "アプリDL") return "無料でダウンロード";
+    if (campaignType === "ブランド認知") return "ブランドを見る";
+    if (campaignType === "イベント") return "イベントを見る";
+    return "詳しく見る";
+  }, [campaignType]);
+
+  const campaignFocus = useMemo(() => {
+    if (campaignType === "求人") {
+      return {
+        main: "応募したくなる求人広告",
+        points: ["職種・勤務地・給与・未経験歓迎を明確にする", "安心感と働きやすさを訴求", "応募CTAを強くする"],
+      };
+    }
+
+    if (campaignType === "店舗集客") {
+      return {
+        main: "来店予約につながる集客広告",
+        points: ["地域名・雰囲気・口コミ感を重視", "予約や来店のハードルを下げる", "店舗写真風の構図が有効"],
+      };
+    }
+
+    if (campaignType === "商品販売") {
+      return {
+        main: "購入につながる商品広告",
+        points: ["商品ベネフィットを一瞬で伝える", "価格・限定・使った後の変化を強調", "商品を主役にする"],
+      };
+    }
+
+    if (campaignType === "サービス申込") {
+      return {
+        main: "申込につながるサービス広告",
+        points: ["課題解決と導入メリットを明確化", "不安を減らす信頼要素を入れる", "申込CTAをわかりやすくする"],
+      };
+    }
+
+    if (campaignType === "リード獲得") {
+      return {
+        main: "問い合わせにつながるリード広告",
+        points: ["無料相談・診断・特典を強調", "信頼性と専門性を出す", "入力ハードルを下げる"],
+      };
+    }
+
+    if (campaignType === "LINE登録") {
+      return {
+        main: "LINE登録につながる広告",
+        points: ["登録特典を明確にする", "無料・限定・簡単さを強調", "スマホ視認性を重視"],
+      };
+    }
+
+    if (campaignType === "資料請求") {
+      return {
+        main: "資料請求につながる広告",
+        points: ["法人向けの信頼感を重視", "資料で得られる情報を明確にする", "導入事例や実績感を入れる"],
+      };
+    }
+
+    if (campaignType === "アプリDL") {
+      return {
+        main: "アプリDLにつながる広告",
+        points: ["アプリ画面・体験価値を伝える", "無料・簡単・便利を強調", "DL後のメリットを見せる"],
+      };
+    }
+
+    if (campaignType === "ブランド認知") {
+      return {
+        main: "印象に残るブランド広告",
+        points: ["世界観・トーン・余白を重視", "ブランド名を覚えやすく見せる", "売り込み感を弱める"],
+      };
+    }
+
+    if (campaignType === "イベント") {
+      return {
+        main: "参加につながるイベント広告",
+        points: ["日時・場所・参加メリットを明確にする", "限定感と楽しさを出す", "参加CTAを目立たせる"],
+      };
+    }
+
+    return {
+      main: "目的に合わせた広告",
+      points: ["広告目的を明確にする", "ターゲットに合わせたCTAにする", "訴求を絞る"],
+    };
+  }, [campaignType]);
+
   const generateCopies = () => {
     const name = product.trim() || "商品・サービス";
     const point = appeal.trim() || "魅力";
     const audience = target.trim() || "あなた";
+    const defaultCta = campaignCta;
 
     if (copyTone === "強め") {
       setMainCopy(`${name}で今すぐ成果を変える`);
       setSubCopy(`${point}を一瞬で伝え、行動したくなる広告にする`);
-      setCtaCopy("今すぐチェック");
+      setCtaCopy(defaultCta);
       setBenefitCopy(`${point}で、迷わず選ばれる理由を作る`);
       setProblemCopy(`まだ${name}を試していないなら、機会損失かもしれません`);
       setTrustCopy(`選ばれる理由がひと目で伝わる設計`);
@@ -301,7 +433,7 @@ export default function Home() {
     if (copyTone === "自然") {
       setMainCopy(`${name}をもっと身近に`);
       setSubCopy(`${point}を自然に伝え、SNSになじむ広告にする`);
-      setCtaCopy("詳しく見る");
+      setCtaCopy(defaultCta);
       setBenefitCopy(`毎日の中で自然に使える${name}`);
       setProblemCopy(`無理なく続けられる方法を探している方へ`);
       setTrustCopy(`自然体で伝わるから、共感されやすい`);
@@ -315,7 +447,7 @@ export default function Home() {
     if (copyTone === "高級") {
       setMainCopy(`上質な${name}を`);
       setSubCopy(`${point}を洗練された世界観で伝える`);
-      setCtaCopy("詳細を見る");
+      setCtaCopy(defaultCta);
       setBenefitCopy(`日常を一段上げる、上質な選択`);
       setProblemCopy(`妥協しない人のための${name}`);
       setTrustCopy(`品質と世界観で選ばれるブランド体験`);
@@ -329,7 +461,7 @@ export default function Home() {
     if (copyTone === "共感") {
       setMainCopy(`その悩み、${name}で変えられる`);
       setSubCopy(`${audience}の気持ちに寄り添い、${point}をやさしく伝える`);
-      setCtaCopy("まずは見てみる");
+      setCtaCopy(defaultCta);
       setBenefitCopy(`無理せず、自分らしく変われる`);
       setProblemCopy(`頑張っているのに、なかなか変わらないあなたへ`);
       setTrustCopy(`同じ悩みを持つ人に選ばれています`);
@@ -343,7 +475,7 @@ export default function Home() {
     if (copyTone === "悩み解決") {
       setMainCopy(`${point}の悩みを解決`);
       setSubCopy(`${name}で、今の課題をわかりやすく改善へ導く`);
-      setCtaCopy("解決方法を見る");
+      setCtaCopy(defaultCta);
       setBenefitCopy(`悩みを放置せず、具体的な一歩へ`);
       setProblemCopy(`こんな悩み、後回しにしていませんか？`);
       setTrustCopy(`課題から逆算したわかりやすい提案`);
@@ -357,7 +489,7 @@ export default function Home() {
     if (copyTone === "実績") {
       setMainCopy(`選ばれる${name}`);
       setSubCopy(`${point}と信頼感を伝え、比較検討中の不安を減らす`);
-      setCtaCopy("実績を見る");
+      setCtaCopy(defaultCta);
       setBenefitCopy(`選ばれている理由がわかる`);
       setProblemCopy(`失敗したくない選択だからこそ、信頼できるものを`);
       setTrustCopy(`実績・レビュー・安心感で選ばれる`);
@@ -371,7 +503,7 @@ export default function Home() {
     if (copyTone === "限定") {
       setMainCopy(`今だけ、${name}をお得に`);
       setSubCopy(`${point}を期間限定感と一緒に強く訴求する`);
-      setCtaCopy("限定価格を見る");
+      setCtaCopy(defaultCta);
       setBenefitCopy(`今始める理由がある特別なチャンス`);
       setProblemCopy(`後で見ようと思って、逃していませんか？`);
       setTrustCopy(`限定でも価値が伝わる安心設計`);
@@ -385,7 +517,7 @@ export default function Home() {
     if (copyTone === "お得") {
       setMainCopy(`${name}を賢く始める`);
       setSubCopy(`${point}をお得感とわかりやすさで伝える`);
-      setCtaCopy("お得に始める");
+      setCtaCopy(defaultCta);
       setBenefitCopy(`コストを抑えて、しっかり価値を実感`);
       setProblemCopy(`高いだけの選択で損していませんか？`);
       setTrustCopy(`価格だけでなく、価値も納得できる`);
@@ -399,7 +531,7 @@ export default function Home() {
     if (copyTone === "SNS風") {
       setMainCopy(`これ、ほんとに便利`);
       setSubCopy(`${name}の${point}を投稿風に自然に伝える`);
-      setCtaCopy("投稿を見る");
+      setCtaCopy(defaultCta);
       setBenefitCopy(`使ってみたくなるリアルな魅力`);
       setProblemCopy(`もっと早く知りたかった、と思える選択`);
       setTrustCopy(`リアルな使用感が伝わる見せ方`);
@@ -413,7 +545,7 @@ export default function Home() {
     if (copyTone === "BtoB") {
       setMainCopy(`${name}で業務を効率化`);
       setSubCopy(`${point}をわかりやすく伝え、問い合わせや資料請求につなげる`);
-      setCtaCopy("資料を見る");
+      setCtaCopy(defaultCta);
       setBenefitCopy(`業務負担を減らし、成果につながる仕組みへ`);
       setProblemCopy(`今の業務フローに、ムダが残っていませんか？`);
       setTrustCopy(`法人導入に必要な信頼感を重視`);
@@ -441,6 +573,7 @@ export default function Home() {
       setStyle(data.style || "");
       setColor(data.color || "");
       setMemo(data.memo || "");
+      setCampaignType(data.campaignType || "商品販売");
       setAdType(data.adType || "CV重視");
       setLanguage(data.language || "日本語");
       setSize(data.size || "1080×1080");
@@ -474,7 +607,7 @@ export default function Home() {
       generateCopies();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [product, target, appeal, copyTone]);
+  }, [product, target, appeal, copyTone, campaignType]);
 
   useEffect(() => {
     setSelectedDesignTitles((current) => current.slice(0, selectedDesignCount));
@@ -485,8 +618,9 @@ export default function Home() {
   }, [selectedDesignTitles]);
 
   const qualityScore = useMemo(() => {
-    let score = 40;
+    let score = 35;
 
+    if (campaignType) score += 8;
     if (product.trim()) score += 10;
     if (target.trim()) score += 12;
     if (appeal.trim()) score += 13;
@@ -501,6 +635,7 @@ export default function Home() {
 
     return Math.min(score, 100);
   }, [
+    campaignType,
     product,
     target,
     appeal,
@@ -514,23 +649,45 @@ export default function Home() {
     color,
   ]);
 
+  const analysisScores = useMemo(() => {
+    const scrollStopRate =
+      adType === "CTR重視" || adType === "セール訴求" ? 92 : adType === "UGC風" ? 84 : 76;
+
+    const clickPotential =
+      adType === "CTR重視" ? 94 : campaignType === "LINE登録" || campaignType === "アプリDL" ? 88 : 78;
+
+    const conversionPotential =
+      adType === "CV重視" || campaignType === "資料請求" || campaignType === "リード獲得" ? 92 : 76;
+
+    const trustLevel =
+      adType === "BtoB" || campaignType === "求人" || campaignType === "資料請求" ? 92 : 78;
+
+    const clarity =
+      product && target && appeal ? 90 : product && appeal ? 75 : 62;
+
+    return {
+      scrollStopRate,
+      clickPotential,
+      conversionPotential,
+      trustLevel,
+      clarity,
+    };
+  }, [adType, campaignType, product, target, appeal]);
+
   const persona = useMemo(() => {
-    if (target.includes("女性")) {
+    if (campaignType === "求人") {
       return [
-        "25〜34歳女性",
-        "InstagramやTikTokで情報収集する傾向",
-        "美容・ライフスタイル・時短・コスパに反応しやすい",
-        "口コミ、実例、Before/Afterに興味を持ちやすい",
-        "広告っぽすぎる表現より、自然で共感できる見せ方を好む",
+        "求職中・転職検討中のユーザー",
+        "勤務地・給与・働きやすさ・未経験可を重視",
+        "応募前の不安を減らす情報に反応しやすい",
       ];
     }
 
-    if (target.includes("男性")) {
+    if (campaignType === "店舗集客") {
       return [
-        "25〜40代男性",
-        "効率・成果・スペック・コスパを重視",
-        "メリットや実績が明確な広告に反応しやすい",
-        "比較・レビュー・数字訴求を確認してから行動する傾向",
+        "近隣エリアで店舗を探しているユーザー",
+        "口コミ・雰囲気・価格・予約のしやすさを重視",
+        "地域名や来店後の体験が伝わる広告に反応しやすい",
       ];
     }
 
@@ -538,87 +695,90 @@ export default function Home() {
       return [
         "企業担当者・意思決定者・マーケティング担当者",
         "ROI、導入実績、信頼性、業務効率化を重視",
-        "清潔感・実績感・信頼感のあるデザインに反応しやすい",
         "問い合わせや資料請求につながる明確なCTAが有効",
+      ];
+    }
+
+    if (target.includes("女性")) {
+      return [
+        "25〜34歳女性",
+        "InstagramやTikTokで情報収集する傾向",
+        "口コミ、実例、Before/Afterに興味を持ちやすい",
       ];
     }
 
     return [
       "SNSや検索で情報収集する一般ユーザー",
-      "興味を持った後に比較検討する傾向",
       "第一印象でメリットが伝わる広告に反応しやすい",
       "難しい説明より、直感的に価値が伝わる表現が有効",
     ];
-  }, [target]);
+  }, [campaignType, target]);
 
   const emotionalHooks = useMemo(() => {
     const hooks: string[] = [];
 
+    if (campaignType === "求人") hooks.push("安心感：未経験・働きやすさ・応募しやすさ");
+    if (campaignType === "店舗集客") hooks.push("近さ・体験価値：行ってみたいと思わせる");
+    if (campaignType === "商品販売") hooks.push("ベネフィット：使った後の変化を想像させる");
+    if (campaignType === "資料請求") hooks.push("信頼感：比較検討に必要な情報を提示");
     if (appeal.includes("無料")) hooks.push("損失回避：無料なら試してみたい心理");
     if (appeal.includes("限定")) hooks.push("希少性：今だけ感による行動促進");
     if (appeal.includes("時短")) hooks.push("時短欲求：面倒を減らしたい心理");
-    if (appeal.includes("簡単")) hooks.push("不安解消：自分にもできそうという安心感");
-    if (appeal.includes("高級")) hooks.push("憧れ：上質な体験への期待");
-    if (appeal.includes("安い") || appeal.includes("割引")) hooks.push("お得感：今買う理由を作る");
     if (appeal.includes("実績") || appeal.includes("口コミ")) hooks.push("社会的証明：他人の評価による安心感");
 
     if (hooks.length === 0) {
-      hooks.push(
-        "興味喚起：まず目に止める",
-        "比較心理：他の商品より良さそうと思わせる",
-        "ベネフィット訴求：使った後の変化を想像させる"
-      );
+      hooks.push("興味喚起：まず目に止める", "比較心理：他の商品より良さそうと思わせる");
     }
 
     return hooks;
-  }, [appeal]);
+  }, [campaignType, appeal]);
 
   const ctaSuggestions = useMemo(() => {
-    if (adType === "CV重視") return ["今すぐ無料体験", "30秒で登録", "無料で始める", "まずは試してみる"];
-    if (adType === "CTR重視") return ["詳しく見る", "今すぐチェック", "続きを見る", "詳細を見る"];
-    if (adType === "高級ブランド") return ["上質な体験を見る", "ブランドを見る", "詳細はこちら", "ラインナップを見る"];
-    if (adType === "UGC風") return ["実際の声を見る", "投稿を見る", "詳しく見る", "試してみる"];
-    if (adType === "セール訴求") return ["限定価格を見る", "今すぐ申し込む", "セールを見る", "お得に始める"];
-    return ["資料を見る", "無料相談する", "導入事例を見る", "問い合わせる"];
-  }, [adType]);
+    if (campaignType === "求人") return ["今すぐ応募", "募集要項を見る", "まずは相談", "職場を見てみる"];
+    if (campaignType === "店舗集客") return ["予約する", "店舗を見る", "空き状況を見る", "今すぐ来店"];
+    if (campaignType === "商品販売") return ["今すぐ購入", "商品を見る", "限定価格を見る", "カートに入れる"];
+    if (campaignType === "サービス申込") return ["申し込む", "無料で始める", "詳細を見る", "相談する"];
+    if (campaignType === "リード獲得") return ["無料相談する", "診断する", "問い合わせる", "今すぐ相談"];
+    if (campaignType === "LINE登録") return ["LINEで受け取る", "友だち追加", "無料特典を受け取る", "LINE登録する"];
+    if (campaignType === "資料請求") return ["資料を見る", "無料で資料請求", "導入事例を見る", "詳細資料を受け取る"];
+    if (campaignType === "アプリDL") return ["無料でダウンロード", "アプリを試す", "今すぐ使う", "ダウンロード"];
+    if (campaignType === "ブランド認知") return ["ブランドを見る", "世界観を見る", "詳しく見る", "ラインナップを見る"];
+    if (campaignType === "イベント") return ["イベントを見る", "参加する", "詳細を見る", "申し込む"];
+    return [campaignCta, "詳しく見る", "今すぐチェック", "詳細を見る"];
+  }, [campaignType, campaignCta]);
 
   const ctrImprovements = useMemo(() => {
     const tips: string[] = [];
 
-    if (!product.trim()) tips.push("商品名を入力すると、バナー文字案とデザイン指示が具体化できます。");
+    if (!product.trim()) tips.push("商品・サービス名を入力すると、広告内容が具体化できます。");
     if (!target.trim()) tips.push("ターゲットを年齢・性別・悩みまで具体化するとCTRが上がりやすくなります。");
     if (!appeal.trim()) tips.push("訴求を入力すると、広告で一番目立たせるべきメッセージが明確になります。");
     if (!mainCopy.trim()) tips.push("メインコピーを入力すると、バナーの第一印象が強くなります。");
-    if (!subCopy.trim()) tips.push("サブコピーを入力すると、補足説明が伝わりやすくなります。");
     if (!ctaCopy.trim()) tips.push("CTAを入力すると、クリック行動を促しやすくなります。");
-    if (!benefitCopy.trim()) tips.push("ベネフィットコピーを入れると、使った後の変化が伝わりやすくなります。");
-    if (!problemCopy.trim()) tips.push("悩み訴求を入れると、ターゲットの自分ごと化がしやすくなります。");
-    if (!trustCopy.trim()) tips.push("信頼訴求を入れると、CV前の不安を減らせます。");
+
+    if (campaignType === "求人") tips.push("求人広告では、勤務地・給与・未経験可・シフト情報を入れると応募率が上がりやすいです。");
+    if (campaignType === "店舗集客") tips.push("店舗集客では、地域名・口コミ・予約しやすさを入れると来店につながりやすいです。");
+    if (campaignType === "商品販売") tips.push("商品広告では、商品写真を主役にして、使った後の変化を見せると効果的です。");
+    if (campaignType === "資料請求") tips.push("資料請求では、得られる情報・導入事例・実績を見せるとCVしやすくなります。");
 
     if (tips.length === 0) {
-      tips.push(
-        "入力内容は十分具体的です。複数デザイン生成でA/Bテストするのがおすすめです。",
-        "CTR重視なら見出しをさらに短く強く、CV重視なら信頼要素を追加しましょう。"
-      );
+      tips.push("入力内容は十分具体的です。複数デザインでA/Bテストするのがおすすめです。");
     }
 
     return tips;
-  }, [
-    product,
-    target,
-    appeal,
-    mainCopy,
-    subCopy,
-    ctaCopy,
-    benefitCopy,
-    problemCopy,
-    trustCopy,
-  ]);
+  }, [campaignType, product, target, appeal, mainCopy, ctaCopy]);
 
   const recommendedDesigns = useMemo(() => {
     const scoreDesign = (title: string) => {
       let score = 0;
-      const text = `${adType} ${product} ${target} ${appeal}`.toLowerCase();
+      const text = `${campaignType} ${adType} ${product} ${target} ${appeal}`.toLowerCase();
+
+      if (campaignType === "求人" && ["Trust", "Minimal", "BtoB"].includes(title)) score += 10;
+      if (campaignType === "店舗集客" && ["UGC", "Pop", "Beauty"].includes(title)) score += 10;
+      if (campaignType === "商品販売" && ["Sale", "CTR Impact", "UGC"].includes(title)) score += 10;
+      if (campaignType === "資料請求" && ["BtoB", "Trust", "Minimal"].includes(title)) score += 10;
+      if (campaignType === "LINE登録" && ["Pop", "CTR Impact", "Sale"].includes(title)) score += 10;
+      if (campaignType === "ブランド認知" && ["Luxury", "Premium Simple", "Minimal"].includes(title)) score += 10;
 
       if (adType === "高級ブランド" && ["Luxury", "Premium Simple", "Beauty"].includes(title)) score += 8;
       if (adType === "UGC風" && ["UGC", "Pop", "Beauty"].includes(title)) score += 8;
@@ -635,17 +795,13 @@ export default function Home() {
         if (["BtoB", "Trust", "Minimal"].includes(title)) score += 4;
       }
 
-      if (text.includes("無料") || text.includes("限定") || text.includes("割引") || text.includes("セール")) {
-        if (["Sale", "CTR Impact", "Pop"].includes(title)) score += 4;
-      }
-
       return score;
     };
 
     return [...ALL_DESIGNS]
       .sort((a, b) => scoreDesign(b.title) - scoreDesign(a.title))
       .slice(0, selectedDesignCount);
-  }, [adType, product, target, appeal, selectedDesignCount]);
+  }, [campaignType, adType, product, target, appeal, selectedDesignCount]);
 
   const selectedDesigns = useMemo(() => {
     if (selectedDesignTitles.length === 0) return recommendedDesigns;
@@ -660,171 +816,86 @@ export default function Home() {
   const primaryPreviewDesign = selectedDesigns[0] || ALL_DESIGNS[0];
 
   const chartData = [
-    { subject: "CTR", value: adType === "CTR重視" ? 95 : 76 },
-    { subject: "CV", value: adType === "CV重視" ? 95 : 72 },
-    { subject: "信頼感", value: adType === "BtoB" ? 95 : 78 },
-    { subject: "UGC感", value: adType === "UGC風" ? 95 : 66 },
-    { subject: "高級感", value: adType === "高級ブランド" ? 95 : 62 },
+    { subject: "停止率", value: analysisScores.scrollStopRate },
+    { subject: "クリック", value: analysisScores.clickPotential },
+    { subject: "CV", value: analysisScores.conversionPotential },
+    { subject: "信頼感", value: analysisScores.trustLevel },
+    { subject: "明確さ", value: analysisScores.clarity },
   ];
 
   const prompt = useMemo(() => {
     const designInstructions = selectedDesigns
       .map(
         (design, index) => `
-【バナー ${index + 1}: ${design.title}】
-- デザインテイスト: ${design.style}
-- 推奨カラー: ${color || design.color}
-- レイアウト方針: ${design.layout}
-- 向いている用途: ${design.purpose}
-- 他のバナーと明確に違う見た目、構図、色使いにしてください。`
+【${index + 1}. ${design.title}】
+スタイル: ${design.style}
+カラー: ${color || design.color}`
       )
       .join("\n");
 
-    const personaText = persona.map((item) => `- ${item}`).join("\n");
-    const hookText = emotionalHooks.map((item) => `- ${item}`).join("\n");
-    const ctaText = ctaSuggestions.map((item) => `- ${item}`).join("\n");
-    const improvementText = ctrImprovements.map((item) => `- ${item}`).join("\n");
+    return `Meta広告用バナーを作成してください。
 
-    return `あなたはMeta広告に強いプロの広告デザイナー兼クリエイティブディレクターです。
-さらに、広告運用・CTR改善・CV改善に詳しいマーケティング戦略担当者として考えてください。
+【広告情報】
+広告ジャンル: ${campaignType}
+広告タイプ: ${adType}
+商品・サービス: ${product || "未入力"}
+ターゲット: ${target || "未入力"}
+主な訴求: ${appeal || "未入力"}
+目的: ${campaignFocus.main}
 
-以下の入力内容をもとに、Facebook / Instagram広告で成果が出やすいバナー画像を作成してください。
+【サイズ】
+各バナー: ${size}
+出力サイズ: ${finalCanvasSize}
+レイアウト: ${layoutInstruction}
 
-【最重要ルール】
-- 出力は横並びレイアウトにしてください。
-- ${selectedDesignCount}種類のデザイン違いのMeta広告バナーを、1枚の横長キャンバスに横並びで配置してください。
-- 各バナーは完全に独立した別デザインにしてください。
-- 1バナー = 1広告クリエイティブとして成立する構成にしてください。
-- 指定サイズ（${size}）は「各バナー1枚ごとのサイズ」です。
-- 最終的な横長キャンバスサイズは ${finalCanvasSize} 相当です。
-- 比較表デザイン・コラージュ風は禁止です。
-- 各バナーごとに、配色・構図・フォント・CTAデザイン・雰囲気を明確に変えてください。
+【コピー】
+メイン: ${mainCopy || "未入力"}
+サブ: ${subCopy || "未入力"}
+CTA: ${ctaCopy || campaignCta}
 
-【生成するバナー数】
-${selectedDesignCount}種類
+【補助コピー】
+ベネフィット: ${benefitCopy || "未入力"}
+悩み訴求: ${problemCopy || "未入力"}
+信頼訴求: ${trustCopy || "未入力"}
 
-【各バナーのサイズ】
-${size}
-
-【最終出力サイズ】
-${finalCanvasSize}
-
-【商品・サービス】
-${product || "未入力"}
-
-【ターゲット】
-${target || "未入力"}
-
-【主な訴求】
-${appeal || "未入力"}
-
-【広告タイプ】
-${adType}
-
-【コピータイプ】
-${copyTone}
-
-【メインコピー】
-${mainCopy || "未入力"}
-
-【サブコピー】
-${subCopy || "未入力"}
-
-【CTA】
-${ctaCopy || "未入力"}
-
-【ベネフィットコピー】
-${benefitCopy || "未入力"}
-
-【悩み訴求コピー】
-${problemCopy || "未入力"}
-
-【信頼訴求コピー】
-${trustCopy || "未入力"}
-
-【限定訴求コピー】
-${limitedCopy || "未入力"}
-
-【短尺コピー】
-${shortCopy || "未入力"}
-
-【SNS風コピー】
-${snsCopy || "未入力"}
-
-【比較訴求コピー】
-${comparisonCopy || "未入力"}
-
-【長め説明コピー】
-${descriptionCopy || "未入力"}
-
-【希望デザインテイスト】
-${style || "未入力のため、商品・ターゲット・訴求から最適なテイストを判断してください"}
-
-【希望カラー】
-${color || "未入力のため、商品・ターゲット・訴求から最適な配色を判断してください"}
-
-【追加メモ】
-${memo || "なし"}
-
-【想定ペルソナ】
-${personaText}
-
-【感情フック】
-${hookText}
-
-【推奨CTA案】
-${ctaText}
-
-【CTR / CV 改善観点】
-${improvementText}
-
-【デザインパターン指示】
+【デザイン案】
 ${designInstructions}
 
-【プロ向けデザイン共通ルール】
-- Meta広告向けに、スマホ表示でも一瞬で内容が伝わるようにしてください。
-- メインコピーは大きく、視認性高く配置してください。
-- CTAは目立つ場所に配置し、クリックしたくなる見せ方にしてください。
-- 情報を詰め込みすぎず、余白を活かしてください。
-- 商品・ターゲット・訴求内容に合わせて、フォント、配色、構図、写真/イラストの方向性を最適化してください。
-- 汎用テンプレートではなく、この入力内容に合った広告クリエイティブにしてください。
-- 高級感が必要なら余白とミニマル表現を重視してください。
-- CTR重視なら強いコントラスト、大きな見出し、目を止める構図を使ってください。
-- CV重視なら信頼感、安心感、CTAの明確さを重視してください。
-- UGC風なら広告感を弱め、SNS投稿に自然になじむ構図にしてください。
-- セール訴求なら限定感、価格感、緊急感を強調してください。
-- BtoBなら清潔感、信頼感、実績感、読みやすさを重視してください。
+【広告ジャンル別の重要ポイント】
+${campaignFocus.points.map((point) => `- ${point}`).join("\n")}
+
+【デザインルール】
+- Meta広告向け
+- スマホで視認性高く
+- 文字は大きく読みやすく
+- CTAは目立たせる
+- 各バナーは完全に独立
+- 各バナーで構図・配色・CTA表現を変える
+- 3枚以下は横1列、4枚以上は3列グリッド
+- 比較表・コラージュは禁止
 
 【出力】
-${finalCanvasSize} 相当の横長キャンバスに、${size} 相当の独立した広告バナーを ${selectedDesignCount} 個、横並びで生成してください。`;
+${finalCanvasSize} 相当の1枚のキャンバスに、${size} 相当の独立した広告バナーを ${selectedDesignCount} 個、${layoutInstruction}で生成してください。`;
   }, [
     selectedDesigns,
     selectedDesignCount,
+    campaignType,
+    campaignFocus,
+    campaignCta,
+    adType,
     product,
     target,
     appeal,
-    adType,
     size,
     finalCanvasSize,
+    layoutInstruction,
     mainCopy,
     subCopy,
     ctaCopy,
     benefitCopy,
     problemCopy,
     trustCopy,
-    limitedCopy,
-    shortCopy,
-    snsCopy,
-    comparisonCopy,
-    descriptionCopy,
-    style,
     color,
-    memo,
-    persona,
-    emotionalHooks,
-    ctaSuggestions,
-    ctrImprovements,
-    copyTone,
   ]);
 
   const saveForm = () => {
@@ -835,6 +906,7 @@ ${finalCanvasSize} 相当の横長キャンバスに、${size} 相当の独立�
       style,
       color,
       memo,
+      campaignType,
       adType,
       language,
       size,
@@ -862,6 +934,7 @@ ${finalCanvasSize} 相当の横長キャンバスに、${size} 相当の独立�
       product: product || "未入力",
       target: target || "未入力",
       appeal: appeal || "未入力",
+      campaignType,
       adType,
       createdAt: new Date().toLocaleString(),
       prompt,
@@ -888,6 +961,7 @@ ${finalCanvasSize} 相当の横長キャンバスに、${size} 相当の独立�
     setStyle("");
     setColor("");
     setMemo("");
+    setCampaignType("商品販売");
     setAdType("CV重視");
     setLanguage("日本語");
     setSize("1080×1080");
@@ -914,18 +988,15 @@ ${finalCanvasSize} 相当の横長キャンバスに、${size} 相当の独立�
   };
 
   const openChatGPT = async () => {
-  try {
-    setLoading(true);
-
-    await navigator.clipboard.writeText(prompt);
-
-    setLoading(false);
-  } catch (error) {
-    setLoading(false);
-
-    console.error(error);
-  }
-};
+    try {
+      setLoading(true);
+      await navigator.clipboard.writeText(prompt);
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+      console.error(error);
+    }
+  };
 
   const deleteHistoryItem = (id: number) => {
     const ok = confirm("この保存データを削除しますか？");
@@ -961,7 +1032,7 @@ ${finalCanvasSize} 相当の横長キャンバスに、${size} 相当の独立�
                 <h1 className="text-2xl font-black tracking-tight">Meta Creative Studio</h1>
               </div>
               <p className="mt-1 text-sm font-medium text-gray-500">
-                広告設定からコピー作成、デザイン選択、生成内容の作成までをまとめて管理します。
+                広告ジャンルに合わせて、コピー・デザイン・生成プロンプトを作成します。
               </p>
             </div>
 
@@ -971,14 +1042,14 @@ ${finalCanvasSize} 相当の横長キャンバスに、${size} 相当の独立�
               </button>
 
               <a
-  href="https://chatgpt.com/?hints=search"
-  target="_blank"
-  rel="noopener noreferrer"
-  onMouseDown={openChatGPT}
-  className="rounded-xl bg-blue-600 px-4 py-2 text-sm font-bold text-white shadow-sm hover:bg-blue-700"
->
-  ChatGPTを開く
-</a>
+                href="https://chatgpt.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                onMouseDown={openChatGPT}
+                className="rounded-xl bg-blue-600 px-4 py-2 text-sm font-bold text-white shadow-sm hover:bg-blue-700"
+              >
+                バナーを作る
+              </a>
 
               <button onClick={() => setDarkMode(!darkMode)} className={`rounded-xl border px-3 py-2 ${darkMode ? "border-zinc-700 bg-zinc-800" : "border-gray-200 bg-white"}`}>
                 {darkMode ? <Sun size={18} /> : <Moon size={18} />}
@@ -991,6 +1062,7 @@ ${finalCanvasSize} 相当の横長キャンバスに、${size} 相当の独立�
           <aside className={`rounded-2xl border p-5 shadow-sm ${panel}`}>
             <div className="space-y-6">
               <SidebarSection title="広告設定" icon={<ClipboardList size={18} />}>
+                <Select label="広告ジャンル" value={campaignType} onChange={(v) => setCampaignType(v as CampaignType)} options={CAMPAIGN_TYPES} />
                 <Select label="広告タイプ" value={adType} onChange={(v) => setAdType(v as AdType)} options={["CV重視", "CTR重視", "高級ブランド", "UGC風", "セール訴求", "BtoB"]} />
                 <Select label="出力言語" value={language} onChange={(v) => setLanguage(v as Language)} options={["日本語", "英語"]} />
                 <Select label="画像サイズ" value={size} onChange={(v) => setSize(v as BannerSize)} options={["1080×1080", "1200×628", "1080×1920"]} />
@@ -1000,15 +1072,15 @@ ${finalCanvasSize} 相当の横長キャンバスに、${size} 相当の独立�
                   <div className="text-xs font-bold text-gray-500">最終出力サイズ</div>
                   <div className="mt-1 text-2xl font-black">{finalCanvasSize}</div>
                   <p className="mt-2 text-xs font-medium opacity-75">
-                    各バナーは {size}、横並びで出力します。
+                    各バナーは {size}、{layoutInstruction}で出力します。
                   </p>
                 </div>
               </SidebarSection>
 
               <SidebarSection title="商品情報" icon={<Target size={18} />}>
-                <Input label="商品・サービス名" value={product} onChange={setProduct} placeholder="例：AI英会話アプリ" />
-                <Input label="ターゲット" value={target} onChange={setTarget} placeholder="例：20代女性、英語初心者" />
-                <Textarea label="主な訴求" value={appeal} onChange={setAppeal} placeholder="例：1日5分、初月無料、初心者でも簡単" />
+                <Input label="商品・サービス名" value={product} onChange={setProduct} placeholder="例：AI英会話アプリ / カフェスタッフ募集" />
+                <Input label="ターゲット" value={target} onChange={setTarget} placeholder="例：20代女性 / 渋谷周辺の求職者" />
+                <Textarea label="主な訴求" value={appeal} onChange={setAppeal} placeholder="例：1日5分、初月無料、未経験歓迎、駅近" />
               </SidebarSection>
 
               <SidebarSection title="デザイン条件" icon={<Palette size={18} />}>
@@ -1049,13 +1121,14 @@ ${finalCanvasSize} 相当の横長キャンバスに、${size} 相当の独立�
               panel={panel}
               softPanel={softPanel}
               designs={selectedDesigns}
-              primaryDesign={primaryPreviewDesign}
               mainCopy={mainCopy}
               subCopy={subCopy}
               ctaCopy={ctaCopy}
               product={product}
               size={size}
               finalCanvasSize={finalCanvasSize}
+              layoutInstruction={layoutInstruction}
+              campaignType={campaignType}
             />
 
             <div className={`rounded-2xl border shadow-sm ${panel}`}>
@@ -1100,6 +1173,10 @@ ${finalCanvasSize} 相当の横長キャンバスに、${size} 相当の独立�
                       </div>
                     </Card>
 
+                    <Card title="広告ジャンル別ポイント" icon={<Target />} panel={panel}>
+                      <List items={[campaignFocus.main, ...campaignFocus.points]} />
+                    </Card>
+
                     <Card title="想定ペルソナ" icon={<Target />} panel={panel}>
                       <List items={persona} />
                     </Card>
@@ -1123,7 +1200,7 @@ ${finalCanvasSize} 相当の横長キャンバスに、${size} 相当の独立�
                     <div className={`rounded-xl p-5 ${softPanel}`}>
                       <h2 className="text-xl font-black">バナー文字案</h2>
                       <p className="mt-2 text-sm font-medium leading-7 opacity-80">
-                        バナーに入れるキャッチコピー・補足文・CTA・訴求別コピーを作成します。直接編集するとプロンプトへ反映されます。
+                        広告ジャンルとコピータイプに合わせて、バナーに使う文言を作成します。
                       </p>
                     </div>
 
@@ -1136,128 +1213,24 @@ ${finalCanvasSize} 相当の横長キャンバスに、${size} 相当の独立�
                         </button>
 
                         <div className="rounded-xl border border-gray-200 bg-white p-4 text-sm text-gray-700">
-                          <div className="font-black text-gray-900">コピータイプの使い分け</div>
-                          <ul className="mt-3 space-y-2 leading-6">
-                            <li>・強め：CTR重視</li>
-                            <li>・自然 / SNS風：UGC向け</li>
-                            <li>・高級：ブランド向け</li>
-                            <li>・実績 / BtoB：CV向け</li>
-                            <li>・限定 / お得：セール向け</li>
-                          </ul>
+                          <div className="font-black text-gray-900">現在の推奨CTA</div>
+                          <div className="mt-2 rounded-lg bg-blue-50 px-3 py-2 font-bold text-blue-700">{campaignCta}</div>
                         </div>
                       </div>
 
                       <div className="grid gap-5 xl:grid-cols-2">
-                        <Input
-                          label="メインコピー"
-                          value={mainCopy}
-                          onChange={(value) => {
-                            setMainCopy(value);
-                            setHasEditedCopy(true);
-                          }}
-                          placeholder="一番大きく目立つ文字"
-                        />
-
-                        <Input
-                          label="CTA"
-                          value={ctaCopy}
-                          onChange={(value) => {
-                            setCtaCopy(value);
-                            setHasEditedCopy(true);
-                          }}
-                          placeholder="例：今すぐチェック"
-                        />
-
-                        <Textarea
-                          label="サブコピー"
-                          value={subCopy}
-                          onChange={(value) => {
-                            setSubCopy(value);
-                            setHasEditedCopy(true);
-                          }}
-                          placeholder="メインコピーを補足する説明文"
-                        />
-
-                        <Textarea
-                          label="ベネフィットコピー"
-                          value={benefitCopy}
-                          onChange={(value) => {
-                            setBenefitCopy(value);
-                            setHasEditedCopy(true);
-                          }}
-                          placeholder="使うことで得られるメリット"
-                        />
-
-                        <Textarea
-                          label="悩み訴求コピー"
-                          value={problemCopy}
-                          onChange={(value) => {
-                            setProblemCopy(value);
-                            setHasEditedCopy(true);
-                          }}
-                          placeholder="ターゲットの悩みを言語化"
-                        />
-
-                        <Textarea
-                          label="信頼訴求コピー"
-                          value={trustCopy}
-                          onChange={(value) => {
-                            setTrustCopy(value);
-                            setHasEditedCopy(true);
-                          }}
-                          placeholder="実績・レビュー・安心感"
-                        />
-
-                        <Textarea
-                          label="限定訴求コピー"
-                          value={limitedCopy}
-                          onChange={(value) => {
-                            setLimitedCopy(value);
-                            setHasEditedCopy(true);
-                          }}
-                          placeholder="今だけ・数量限定・キャンペーン"
-                        />
-
-                        <Textarea
-                          label="短尺コピー"
-                          value={shortCopy}
-                          onChange={(value) => {
-                            setShortCopy(value);
-                            setHasEditedCopy(true);
-                          }}
-                          placeholder="短く強い一言"
-                        />
-
-                        <Textarea
-                          label="SNS風コピー"
-                          value={snsCopy}
-                          onChange={(value) => {
-                            setSnsCopy(value);
-                            setHasEditedCopy(true);
-                          }}
-                          placeholder="投稿っぽい自然な表現"
-                        />
-
-                        <Textarea
-                          label="比較訴求コピー"
-                          value={comparisonCopy}
-                          onChange={(value) => {
-                            setComparisonCopy(value);
-                            setHasEditedCopy(true);
-                          }}
-                          placeholder="従来・他社・今までとの違い"
-                        />
-
+                        <Input label="メインコピー" value={mainCopy} onChange={(value) => { setMainCopy(value); setHasEditedCopy(true); }} />
+                        <Input label="CTA" value={ctaCopy} onChange={(value) => { setCtaCopy(value); setHasEditedCopy(true); }} />
+                        <Textarea label="サブコピー" value={subCopy} onChange={(value) => { setSubCopy(value); setHasEditedCopy(true); }} />
+                        <Textarea label="ベネフィットコピー" value={benefitCopy} onChange={(value) => { setBenefitCopy(value); setHasEditedCopy(true); }} />
+                        <Textarea label="悩み訴求コピー" value={problemCopy} onChange={(value) => { setProblemCopy(value); setHasEditedCopy(true); }} />
+                        <Textarea label="信頼訴求コピー" value={trustCopy} onChange={(value) => { setTrustCopy(value); setHasEditedCopy(true); }} />
+                        <Textarea label="限定訴求コピー" value={limitedCopy} onChange={(value) => { setLimitedCopy(value); setHasEditedCopy(true); }} />
+                        <Textarea label="短尺コピー" value={shortCopy} onChange={(value) => { setShortCopy(value); setHasEditedCopy(true); }} />
+                        <Textarea label="SNS風コピー" value={snsCopy} onChange={(value) => { setSnsCopy(value); setHasEditedCopy(true); }} />
+                        <Textarea label="比較訴求コピー" value={comparisonCopy} onChange={(value) => { setComparisonCopy(value); setHasEditedCopy(true); }} />
                         <div className="xl:col-span-2">
-                          <Textarea
-                            label="長め説明コピー"
-                            value={descriptionCopy}
-                            onChange={(value) => {
-                              setDescriptionCopy(value);
-                              setHasEditedCopy(true);
-                            }}
-                            placeholder="広告文や補足説明に使える長めのコピー"
-                          />
+                          <Textarea label="長め説明コピー" value={descriptionCopy} onChange={(value) => { setDescriptionCopy(value); setHasEditedCopy(true); }} />
                         </div>
                       </div>
                     </div>
@@ -1271,7 +1244,7 @@ ${finalCanvasSize} 相当の横長キャンバスに、${size} 相当の独立�
                         <div>
                           <h2 className="text-xl font-black">デザイン選択</h2>
                           <p className="mt-2 text-sm font-medium leading-7 opacity-80">
-                            1〜10枚まで選択できます。未選択の場合は、広告タイプ・商品・ターゲット・訴求から推奨デザインを自動採用します。
+                            1〜9枚まで選択できます。4枚以上は3列グリッドで生成します。
                           </p>
                         </div>
 
@@ -1337,9 +1310,9 @@ ${finalCanvasSize} 相当の横長キャンバスに、${size} 相当の独立�
                         コピー
                       </button>
 
-                      <button onClick={openChatGPT} className="rounded-xl bg-blue-600 px-5 py-3 font-bold text-white hover:bg-blue-700">
+                      <a href="https://chatgpt.com/" target="_blank" rel="noopener noreferrer" onMouseDown={openChatGPT} className="rounded-xl bg-blue-600 px-5 py-3 font-bold text-white hover:bg-blue-700">
                         バナーを作る
-                      </button>
+                      </a>
                     </div>
 
                     <pre className="max-h-[720px] overflow-auto whitespace-pre-wrap break-words rounded-xl bg-gray-950 p-5 text-sm leading-7 text-green-400">
@@ -1353,25 +1326,25 @@ ${finalCanvasSize} 相当の横長キャンバスに、${size} 相当の独立�
                     <div className={`rounded-xl p-5 ${softPanel}`}>
                       <h2 className="text-xl font-black">使い方</h2>
                       <p className="mt-2 text-sm font-medium leading-7 opacity-80">
-                        商品情報を入力すると、改善チェック・バナー文字案・デザイン選択・画像生成用プロンプトをまとめて作成できます。
+                        広告ジャンル、商品情報、コピー、デザインを選ぶだけで生成プロンプトを作成できます。
                       </p>
                     </div>
 
                     <div className="grid gap-4 md:grid-cols-2">
-                      <Card title="1. 商品情報を入力" icon={<Target />} panel={panel}>
-                        <List items={["商品・サービス名を入力", "ターゲットを具体化", "主な訴求を入力", "必要に応じてカラーやテイストを指定"]} />
+                      <Card title="1. 広告ジャンルを選ぶ" icon={<Target />} panel={panel}>
+                        <List items={["求人・店舗集客・商品販売などを選択", "広告目的に合ったCTAへ自動調整", "デザイン推奨もジャンルに合わせて変化"]} />
                       </Card>
 
                       <Card title="2. コピーを調整" icon={<MessageSquareText />} panel={panel}>
-                        <List items={["コピータイプを選択", "コピー更新で文字案を作成", "各コピー欄を直接編集", "編集内容はプロンプトへ自動反映"]} />
+                        <List items={["コピータイプを選択", "コピー更新で文字案を作成", "必要に応じて直接編集"]} />
                       </Card>
 
                       <Card title="3. デザインを選択" icon={<Sparkles />} panel={panel}>
-                        <List items={["デザインパターン数を1〜10枚から選択", "10種類のデザイン案から選択", "未選択の場合は推奨を自動採用", "各バナーは独立デザインとして生成"]} />
+                        <List items={["1〜9枚から選択", "3枚以下は横1列", "4枚以上は3列グリッド"]} />
                       </Card>
 
                       <Card title="4. バナーを作る" icon={<Wand2 />} panel={panel}>
-                        <List items={["バナーを作るを押す", "プロンプトが自動コピーされる", "ChatGPTが新規タブで開く", "コピーされた内容を貼り付けて画像生成"]} />
+                        <List items={["プロンプトをコピー", "ChatGPTを開く", "貼り付けて画像生成"]} />
                       </Card>
                     </div>
                   </motion.div>
@@ -1391,13 +1364,13 @@ ${finalCanvasSize} 相当の横長キャンバスに、${size} 相当の独立�
                     {history.length > 0 && (
                       <div className="overflow-hidden rounded-xl border border-gray-200">
                         <div className="overflow-x-auto">
-                          <table className="w-full min-w-[760px] border-collapse bg-white text-left text-sm text-gray-900">
+                          <table className="w-full min-w-[860px] border-collapse bg-white text-left text-sm text-gray-900">
                             <thead className="bg-gray-50 text-xs uppercase text-gray-500">
                               <tr>
                                 <th className="px-4 py-3">商品</th>
+                                <th className="px-4 py-3">ジャンル</th>
                                 <th className="px-4 py-3">ターゲット</th>
                                 <th className="px-4 py-3">訴求</th>
-                                <th className="px-4 py-3">広告タイプ</th>
                                 <th className="px-4 py-3">保存日時</th>
                                 <th className="px-4 py-3 text-right">操作</th>
                               </tr>
@@ -1407,9 +1380,9 @@ ${finalCanvasSize} 相当の横長キャンバスに、${size} 相当の独立�
                               {history.map((item) => (
                                 <tr key={item.id} className="hover:bg-gray-50">
                                   <td className="max-w-[180px] truncate px-4 py-4 font-bold">{item.product}</td>
+                                  <td className="px-4 py-4">{item.campaignType}</td>
                                   <td className="max-w-[180px] truncate px-4 py-4">{item.target}</td>
                                   <td className="max-w-[220px] truncate px-4 py-4">{item.appeal}</td>
-                                  <td className="px-4 py-4">{item.adType}</td>
                                   <td className="px-4 py-4 text-gray-500">{item.createdAt}</td>
                                   <td className="px-4 py-4">
                                     <div className="flex justify-end gap-2">
@@ -1489,24 +1462,26 @@ function PreviewArea({
   panel,
   softPanel,
   designs,
-  primaryDesign,
   mainCopy,
   subCopy,
   ctaCopy,
   product,
   size,
   finalCanvasSize,
+  layoutInstruction,
+  campaignType,
 }: {
   panel: string;
   softPanel: string;
   designs: DesignPattern[];
-  primaryDesign: DesignPattern;
   mainCopy: string;
   subCopy: string;
   ctaCopy: string;
   product: string;
   size: BannerSize;
   finalCanvasSize: string;
+  layoutInstruction: string;
+  campaignType: CampaignType;
 }) {
   return (
     <div className={`rounded-2xl border p-5 shadow-sm ${panel}`}>
@@ -1514,31 +1489,30 @@ function PreviewArea({
         <div>
           <h2 className="text-xl font-black">プレビュー</h2>
           <p className="mt-1 text-sm font-medium text-gray-500">
-            実際の生成前に、コピーとデザイン方向性を確認できます。
+            実際の広告に近い見た目で、コピーとデザイン方向性を確認できます。
           </p>
         </div>
 
         <div className={`rounded-xl px-4 py-3 text-sm font-bold ${softPanel}`}>
-          {size} / 最終 {finalCanvasSize}
+          {size} / {layoutInstruction} / 最終 {finalCanvasSize}
         </div>
       </div>
 
-      <div>
-        <div className="overflow-x-auto rounded-xl border border-gray-200 bg-gray-50 p-4">
-          <div className="flex min-w-max gap-4">
-            {designs.map((design, index) => (
-              <div key={`${design.title}-${index}`} className="w-[260px] shrink-0">
-                <AdPreviewCard
-                  design={design}
-                  mainCopy={mainCopy}
-                  subCopy={subCopy}
-                  ctaCopy={ctaCopy}
-                  product={product}
-                  badge={`${index + 1}`}
-                />
-              </div>
-            ))}
-          </div>
+      <div className="overflow-x-auto rounded-xl border border-gray-200 bg-gray-50 p-4">
+        <div className="flex min-w-max gap-4">
+          {designs.map((design, index) => (
+            <div key={`${design.title}-${index}`} className="w-[260px] shrink-0">
+              <AdPreviewCard
+                design={design}
+                mainCopy={mainCopy}
+                subCopy={subCopy}
+                ctaCopy={ctaCopy}
+                product={product}
+                badge={`${index + 1}`}
+                campaignType={campaignType}
+              />
+            </div>
+          ))}
         </div>
       </div>
     </div>
@@ -1552,6 +1526,7 @@ function AdPreviewCard({
   ctaCopy,
   product,
   badge,
+  campaignType,
 }: {
   design: DesignPattern;
   mainCopy: string;
@@ -1559,29 +1534,42 @@ function AdPreviewCard({
   ctaCopy: string;
   product: string;
   badge: string;
+  campaignType: CampaignType;
 }) {
   return (
-    <div className={`relative aspect-square overflow-hidden rounded-xl p-5 shadow-sm ${design.previewClass}`}>
-      <div className="absolute right-4 top-4 rounded-full bg-white/20 px-3 py-1 text-xs font-black backdrop-blur">
-        {badge}
+    <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+      <div className="flex items-center justify-between border-b border-gray-100 px-4 py-3 text-xs text-gray-500">
+        <div className="font-bold">Sponsored</div>
+        <div>{campaignType}</div>
       </div>
 
-      <div className="flex h-full flex-col justify-between">
-        <div>
-          <div className="text-xs font-bold opacity-75">{product || "Product"}</div>
-          <div className="mt-5 max-w-[92%] text-3xl font-black leading-tight">
-            {mainCopy || "メインコピー"}
-          </div>
-          <p className="mt-4 max-w-[90%] text-sm font-semibold leading-6 opacity-85">
-            {subCopy || "サブコピーが入ります"}
-          </p>
+      <div className={`relative aspect-square overflow-hidden p-5 ${design.previewClass}`}>
+        <div className="absolute right-4 top-4 rounded-full bg-white/20 px-3 py-1 text-xs font-black backdrop-blur">
+          {badge}
         </div>
 
-        <div>
-          <div className={`inline-flex rounded-full px-5 py-3 text-sm font-black shadow-sm ${design.accentClass}`}>
-            {ctaCopy || "詳しく見る"}
+        <div className="flex h-full flex-col justify-between">
+          <div>
+            <div className="text-xs font-bold opacity-75">{product || "Product"}</div>
+            <div className="mt-5 max-w-[92%] text-3xl font-black leading-tight">
+              {mainCopy || "メインコピー"}
+            </div>
+            <p className="mt-4 max-w-[90%] text-sm font-semibold leading-6 opacity-85">
+              {subCopy || "サブコピーが入ります"}
+            </p>
+          </div>
+
+          <div>
+            <div className={`inline-flex rounded-full px-5 py-3 text-sm font-black shadow-sm ${design.accentClass}`}>
+              {ctaCopy || "詳しく見る"}
+            </div>
           </div>
         </div>
+      </div>
+
+      <div className="flex items-center justify-between px-4 py-3 text-xs font-bold text-gray-500">
+        <span>Meta Ad Preview</span>
+        <span>CTA</span>
       </div>
     </div>
   );

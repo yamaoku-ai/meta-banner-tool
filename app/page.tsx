@@ -334,14 +334,14 @@ const uniqueCopyBundle = (bundle: CopyBundle, name: string): CopyBundle => {
   const used = new Set<string>();
   const fallback: Partial<Record<keyof CopyBundle, string>> = {
     main: `${name}をチェック`,
-    sub: `${name}の特徴がひと目でわかる`,
-    benefit: `選ぶ前に知りたいポイント`,
+    sub: `${name}の魅力がひと目でわかる`,
+    benefit: `選ぶ理由がひと目でわかる`,
     problem: `今の選択に迷っている方へ`,
-    trust: `${name}を選ぶ前に知りたいポイント`,
+    trust: `${name}の魅力を確認できます`,
     limited: `今だけの案内をチェック`,
     short: `${name}を見る`,
     sns: `これ、ちょっと気になる。`,
-    comparison: `比べて選びやすい見せ方`,
+    comparison: `違いがわかり選びやすい`,
     description: `${name}の魅力を、画像内で短く見せるコピーです。`,
   };
 
@@ -641,274 +641,484 @@ export default function Home() {
     };
   }, [campaignType]);
 
-  const buildCopyBundle = (
+  const generateIndustryCopyTemplates = (
     currentCampaignType: CampaignType,
     currentIndustry: ResolvedIndustry,
     currentAdType: AdType,
+    currentCopyTone: CopyTone,
     name: string,
     point: string,
     audience: string
   ): CopyBundle => {
-    const safePoint = point.trim();
     const safeAudience = audience.trim() || "検討中の方";
+    const safePoint = point.trim();
 
-    type IndustryWords = {
+    type IndustryCopyWords = {
       item: string;
       place: string;
       main: string;
-      naturalMain: string;
-      trust: string;
-      beginner: string;
+      sub: string;
       benefit: string;
       problem: string;
-      sns: string;
-      check: string;
-      compare: string;
+      trust: string;
       limited: string;
+      short: string;
+      sns: string;
+      comparison: string;
+      description: string;
+      strongMain: string;
+      strongSub: string;
+      naturalMain: string;
+      naturalSub: string;
+      premiumMain: string;
+      premiumSub: string;
+      empathyMain: string;
+      empathySub: string;
+      problemMain: string;
+      problemSub: string;
+      proofMain: string;
+      proofSub: string;
+      limitedMain: string;
+      limitedSub: string;
+      dealMain: string;
+      dealSub: string;
+      snsMain: string;
+      snsSub: string;
+      b2bMain: string;
+      b2bSub: string;
     };
 
-    const industryWords: Record<ResolvedIndustry, IndustryWords> = {
+    const industryWords: Record<ResolvedIndustry, IndustryCopyWords> = {
       美容: {
         item: "美容ケア",
         place: "サロン",
-        main: "理想の自分を目指すなら",
-        naturalMain: "毎日のケアをもっと気軽に",
-        trust: "愛用者が増えている美容ケア",
-        beginner: "初めてでも始めやすい美容ケア",
+        main: "毎日のケアをもっと気軽に",
+        sub: "無理なく続けやすい美容ケア",
         benefit: "毎日の習慣に取り入れやすい",
         problem: "今のケアに物足りなさを感じている方へ",
+        trust: "愛用者が増えている美容ケア",
+        limited: "今だけの案内をチェック",
+        short: "詳しく見る",
         sns: "最近これ気になってる",
-        check: "人気の美容ケアをチェック",
-        compare: "自分に合うケアを選びたい方へ",
-        limited: "今だけの美容ケアをチェック",
+        comparison: "続けやすさで選びたい方へ",
+        description: "美容ケアの魅力を自然に伝える画像用コピーです。",
+        strongMain: "理想の自分を目指すなら",
+        strongSub: "毎日のケアに取り入れやすい美容ケア",
+        naturalMain: "毎日のケアをもっと自然に",
+        naturalSub: "無理なく続けやすい美容ケア",
+        premiumMain: "ワンランク上のケア体験",
+        premiumSub: "上質な使い心地にこだわりました",
+        empathyMain: "その悩み、そろそろ手放しませんか？",
+        empathySub: "自分に合うケアを探している方へ",
+        problemMain: "今のケアを見直すきっかけに",
+        problemSub: "肌や印象の悩みに寄り添う美容ケア",
+        proofMain: "多くの方に選ばれる美容ケア",
+        proofSub: "はじめてでも取り入れやすい使い心地",
+        limitedMain: "今だけの美容ケア案内",
+        limitedSub: "気になった今が始めどき",
+        dealMain: "美容ケアを賢く始める",
+        dealSub: "毎日続けやすいケアをお得にチェック",
+        snsMain: "最近これ使ってる人多い",
+        snsSub: "SNSでも見かける美容ケア",
+        b2bMain: "サロン運営をもっとスムーズに",
+        b2bSub: "美容サービスの導入前に確認しやすい内容",
       },
       SaaS: {
         item: "業務ツール",
         place: "サービス",
         main: "業務をもっとスムーズに",
-        naturalMain: "チームで使いやすい業務ツール",
+        sub: "チームで使いやすい業務ツール",
+        benefit: "毎日の作業負担を減らしやすい",
+        problem: "今の運用にムダを感じている方へ",
         trust: "導入企業が増えている業務ツール",
-        beginner: "初めてでも導入しやすいツール",
-        benefit: "毎日の作業を効率化しやすい",
-        problem: "今の運用を見直したい方へ",
-        sns: "こういうツール探してた",
-        check: "サービス内容をチェック",
-        compare: "導入前に比べやすい",
         limited: "無料資料を公開中",
+        short: "資料を見る",
+        sns: "こういうツール探してた",
+        comparison: "使いやすさで選びたい方へ",
+        description: "SaaSの導入メリットを自然に伝える画像用コピーです。",
+        strongMain: "業務改善をもっとスムーズに",
+        strongSub: "チームの作業を見直しやすい業務ツール",
+        naturalMain: "業務をもっとわかりやすく",
+        naturalSub: "チームで使いやすい業務ツール",
+        premiumMain: "スマートな業務運用へ",
+        premiumSub: "無駄を減らしたいチームに合う設計",
+        empathyMain: "その作業、もっとラクにしませんか？",
+        empathySub: "日々の業務負担を見直したい方へ",
+        problemMain: "属人化した運用を見直す",
+        problemSub: "チームで同じ情報を扱いやすく",
+        proofMain: "導入企業が増えている業務ツール",
+        proofSub: "現場で使いやすい機能を搭載",
+        limitedMain: "無料資料を公開中",
+        limitedSub: "導入前にサービス内容を確認",
+        dealMain: "業務ツールを賢く導入",
+        dealSub: "必要な機能を見ながら検討できます",
+        snsMain: "こういうツール探してた",
+        snsSub: "毎日の作業が少しラクになりそう",
+        b2bMain: "導入前に確認したい方へ",
+        b2bSub: "サービス内容を資料で確認できます",
       },
       不動産: {
         item: "住まい",
         place: "物件",
-        main: "理想の暮らしを考えた住まい",
-        naturalMain: "暮らしやすさを考えた住まい",
-        trust: "安心して相談しやすい住まい選び",
-        beginner: "初めてでも相談しやすい住まい",
+        main: "理想の暮らしに近づく住まい",
+        sub: "暮らしやすさと住まいの魅力がわかる",
         benefit: "毎日の暮らしをイメージしやすい",
         problem: "住まい選びで迷っている方へ",
-        sns: "この部屋ちょっと気になる",
-        check: "物件情報をチェック",
-        compare: "条件だけでなく暮らしやすさで選ぶ",
+        trust: "安心して相談しやすい住まい選び",
         limited: "最新物件を公開中",
+        short: "物件を見る",
+        sns: "この部屋ちょっと気になる",
+        comparison: "条件だけでなく暮らしやすさで選ぶ",
+        description: "不動産の魅力と安心感を自然に伝える画像用コピーです。",
+        strongMain: "理想の暮らしを見つける",
+        strongSub: "暮らしやすさにこだわった住まい",
+        naturalMain: "暮らしやすさを考えた住まい",
+        naturalSub: "毎日の生活になじむ空間づくり",
+        premiumMain: "上質な暮らしを叶える住まい",
+        premiumSub: "空間設計と暮らしやすさにこだわりました",
+        empathyMain: "住まい選び、迷っていませんか？",
+        empathySub: "相談しながら自分に合う住まいを探せます",
+        problemMain: "住まい選びの不安を減らす",
+        problemSub: "暮らしのイメージが持ちやすい物件案内",
+        proofMain: "相談しやすさで選ばれる住まい選び",
+        proofSub: "初めての方でも相談しやすい窓口",
+        limitedMain: "最新物件を公開中",
+        limitedSub: "気になる住まいを今すぐチェック",
+        dealMain: "納得できる住まい選びを",
+        dealSub: "条件に合う物件を見つけやすい",
+        snsMain: "この部屋ちょっと気になる",
+        snsSub: "暮らしを想像したくなる住まい",
+        b2bMain: "不動産相談をスムーズに",
+        b2bSub: "物件選びの相談をしやすい案内です",
       },
       教育: {
         item: "学習サービス",
         place: "スクール",
         main: "学びを次の一歩へ",
-        naturalMain: "自分のペースで学べる環境",
-        trust: "続けやすさで選ばれている学習サービス",
-        beginner: "初めてでも始めやすい学習サービス",
+        sub: "続けやすい学習環境をチェック",
         benefit: "自分のペースで学びやすい",
         problem: "学び直しを始めたい方へ",
-        sns: "これなら続けられそう",
-        check: "学習内容をチェック",
-        compare: "学びやすさで選びたい方へ",
+        trust: "続けやすさで選ばれる学習サービス",
         limited: "無料体験受付中",
+        short: "詳しく見る",
+        sns: "これなら続けられそう",
+        comparison: "学びやすさで選びたい方へ",
+        description: "教育サービスの始めやすさを自然に伝える画像用コピーです。",
+        strongMain: "学びを始めるなら今",
+        strongSub: "続けやすい学習環境をチェック",
+        naturalMain: "自分のペースで学べる",
+        naturalSub: "無理なく続けやすい学習サービス",
+        premiumMain: "将来につながる学びを",
+        premiumSub: "質の高い学習環境を選びたい方へ",
+        empathyMain: "学び直し、始めてみませんか？",
+        empathySub: "自分のペースで一歩ずつ進めます",
+        problemMain: "続かない学習を見直す",
+        problemSub: "習慣にしやすい学習環境です",
+        proofMain: "学びやすさで選ばれるサービス",
+        proofSub: "継続しやすいサポートがあります",
+        limitedMain: "無料体験受付中",
+        limitedSub: "まずは気軽に学習内容をチェック",
+        dealMain: "学習を賢く始める",
+        dealSub: "始めやすいプランを確認できます",
+        snsMain: "これなら続けられそう",
+        snsSub: "無理なく学べる雰囲気がいい",
+        b2bMain: "研修をもっとスムーズに",
+        b2bSub: "チームの学習環境を整えやすい内容",
       },
       飲食: {
         item: "人気メニュー",
         place: "お店",
-        main: "今話題のお店",
-        naturalMain: "初めてでも入りやすいお店",
-        trust: "リピーターの多い人気店",
-        beginner: "初めてでも入りやすい人気店",
-        benefit: "行く前に雰囲気が伝わる",
+        main: "今日行きたいお店に",
+        sub: "人気メニューとお店の雰囲気をチェック",
+        benefit: "来店前にお店の魅力が伝わる",
         problem: "今日のお店選びに迷っている方へ",
-        sns: "ここ、次行きたい",
-        check: "人気メニューをチェック",
-        compare: "雰囲気で選びたい方へ",
+        trust: "リピーターの多い人気店",
         limited: "今すぐ予約受付中",
+        short: "店舗を見る",
+        sns: "ここ、次行きたい",
+        comparison: "雰囲気でお店を選びたい方へ",
+        description: "飲食店の雰囲気と来店したくなる理由を伝える画像用コピーです。",
+        strongMain: "今話題のお店",
+        strongSub: "人気メニューとお店の雰囲気をチェック",
+        naturalMain: "初めてでも入りやすいお店",
+        naturalSub: "気軽に楽しめる人気メニュー",
+        premiumMain: "特別な時間を楽しめるお店",
+        premiumSub: "料理と空間にこだわったひととき",
+        empathyMain: "今日のお店、迷っていませんか？",
+        empathySub: "気軽に立ち寄れる雰囲気のお店です",
+        problemMain: "お店選びに迷ったら",
+        problemSub: "人気メニューを見てから選べます",
+        proofMain: "リピーターの多い人気店",
+        proofSub: "口コミでも話題のお店です",
+        limitedMain: "期間限定メニュー登場",
+        limitedSub: "今だけ楽しめる味をチェック",
+        dealMain: "お得に楽しめる人気店",
+        dealSub: "気軽に楽しめるメニューをチェック",
+        snsMain: "ここ、次行きたい",
+        snsSub: "SNSで話題の人気メニュー",
+        b2bMain: "店舗集客をもっとスムーズに",
+        b2bSub: "来店前にお店の魅力が伝わります",
       },
       EC: {
-        item: "人気商品",
+        item: "商品",
         place: "ショップ",
         main: "自分に合う商品を見つける",
-        naturalMain: "毎日使いやすい商品をチェック",
-        trust: "多くの方に選ばれている人気商品",
-        beginner: "初めてでも選びやすい人気商品",
-        benefit: "買う前に魅力がわかる",
+        sub: "使いやすさと魅力をチェック",
+        benefit: "買う前に選ぶ理由がわかる",
         problem: "買う決め手がほしい方へ",
+        trust: "レビューでも選ばれている商品",
+        limited: "期間限定キャンペーン中",
+        short: "商品を見る",
         sns: "これ、買ってよかった系",
-        check: "人気商品をチェック",
-        compare: "レビューで比べて選べる",
-        limited: "今だけのキャンペーンをチェック",
+        comparison: "使いやすさで選びたい方へ",
+        description: "EC商品の魅力と買う理由を自然に伝える画像用コピーです。",
+        strongMain: "人気商品を今すぐチェック",
+        strongSub: "使いやすさと魅力をすぐ確認",
+        naturalMain: "毎日に取り入れやすい商品",
+        naturalSub: "普段使いしやすいポイントがわかる",
+        premiumMain: "ワンランク上の商品体験",
+        premiumSub: "使い心地と見た目にこだわりました",
+        empathyMain: "こういう商品、探していませんか？",
+        empathySub: "毎日使いやすい商品をチェック",
+        problemMain: "買う前の迷いを減らす",
+        problemSub: "自分に合う商品を見つけやすい",
+        proofMain: "多くの方に選ばれている商品",
+        proofSub: "レビューでも注目されている商品です",
+        limitedMain: "今だけ特別価格",
+        limitedSub: "期間限定キャンペーンをチェック",
+        dealMain: "お得に商品をチェック",
+        dealSub: "気になる商品を賢く選べます",
+        snsMain: "これ、買ってよかった系",
+        snsSub: "SNSでも見かける注目商品",
+        b2bMain: "商品管理をもっとスムーズに",
+        b2bSub: "ショップ運営に役立つ内容を確認",
       },
       人材: {
         item: "仕事",
         place: "職場",
-        main: "自分らしく働ける環境へ",
-        naturalMain: "未経験から始めやすい仕事",
-        trust: "働きやすさで選ばれている職場",
-        beginner: "初めてでも応募しやすい仕事",
-        benefit: "応募前に働く雰囲気がわかる",
+        main: "自分らしく働ける場所へ",
+        sub: "仕事内容と職場の雰囲気をチェック",
+        benefit: "応募前に働くイメージが持てる",
         problem: "今の働き方を見直したい方へ",
+        trust: "働きやすさで選ばれている職場",
+        limited: "今だけ募集受付中",
+        short: "求人を見る",
         sns: "この職場ちょっと良さそう",
-        check: "募集内容をチェック",
-        compare: "条件だけでなく働きやすさで選ぶ",
-        limited: "募集受付中",
+        comparison: "条件だけでなく働きやすさで選ぶ",
+        description: "求人の働きやすさと応募しやすさを伝える画像用コピーです。",
+        strongMain: "新しい働き方を始める",
+        strongSub: "今募集中の仕事をチェック",
+        naturalMain: "未経験から始めやすい仕事",
+        naturalSub: "仕事内容と職場の雰囲気がわかる",
+        premiumMain: "安心して働ける環境へ",
+        premiumSub: "働きやすさにこだわった職場です",
+        empathyMain: "今の働き方、見直しませんか？",
+        empathySub: "自分らしく働ける環境を探す方へ",
+        problemMain: "働き方の悩みを見直す",
+        problemSub: "応募前に職場の雰囲気がわかる",
+        proofMain: "働きやすさで選ばれる職場",
+        proofSub: "未経験から始めやすい仕事です",
+        limitedMain: "今だけ募集受付中",
+        limitedSub: "募集枠があるうちにチェック",
+        dealMain: "条件に合う仕事を探す",
+        dealSub: "応募前に働きやすさをチェック",
+        snsMain: "この職場ちょっと良さそう",
+        snsSub: "雰囲気の良さが伝わる求人です",
+        b2bMain: "採用活動をもっとスムーズに",
+        b2bSub: "応募前に職場の魅力が伝わります",
       },
       医療: {
         item: "相談先",
         place: "クリニック",
         main: "まずは気軽に相談を",
-        naturalMain: "不安なことを相談しやすい環境",
-        trust: "丁寧に相談できる環境です",
-        beginner: "初めてでも相談しやすい環境",
+        sub: "不安なことを相談しやすい環境",
         benefit: "安心して相談しやすい",
         problem: "ひとりで悩み続けている方へ",
-        sns: "ここなら相談しやすそう",
-        check: "相談内容をチェック",
-        compare: "安心して相談できる場所を選ぶ",
+        trust: "丁寧に相談できる環境です",
         limited: "相談予約受付中",
+        short: "相談する",
+        sns: "ここなら相談しやすそう",
+        comparison: "安心して相談できる場所を探したい方へ",
+        description: "医療・クリニックの相談しやすさを伝える画像用コピーです。",
+        strongMain: "不安なことはまず相談",
+        strongSub: "相談しやすい環境を整えています",
+        naturalMain: "まずは気軽に相談を",
+        naturalSub: "不安なことを話しやすい場所です",
+        premiumMain: "丁寧な相談環境を選ぶ",
+        premiumSub: "落ち着いて相談しやすい体制です",
+        empathyMain: "その不安、相談してみませんか？",
+        empathySub: "ひとりで悩まず話せる場所があります",
+        problemMain: "不安をそのままにしない",
+        problemSub: "まずは気軽に相談できる環境です",
+        proofMain: "相談しやすさで選ばれる環境",
+        proofSub: "丁寧に話を聞く体制があります",
+        limitedMain: "相談予約受付中",
+        limitedSub: "気になることを早めに相談できます",
+        dealMain: "まずは相談から始める",
+        dealSub: "無理なく相談しやすい環境です",
+        snsMain: "ここなら相談しやすそう",
+        snsSub: "落ち着いて話せる雰囲気があります",
+        b2bMain: "医療相談をもっとわかりやすく",
+        b2bSub: "相談前の不安を減らす案内です",
       },
       金融: {
         item: "相談サービス",
         place: "相談窓口",
         main: "将来のお金を見直す",
-        naturalMain: "今後に向けた選択肢を確認",
-        trust: "専門家へ相談しながら考えられる",
-        beginner: "初めてでも相談しやすい環境",
+        sub: "今後に向けた選択肢を確認",
         benefit: "自分に合う考え方を見つけやすい",
         problem: "お金の判断に迷っている方へ",
-        sns: "一度ちゃんと考えたい",
-        check: "相談内容をチェック",
-        compare: "条件を見ながら考えたい方へ",
+        trust: "専門家に相談しながら考えられる",
         limited: "無料相談受付中",
+        short: "相談する",
+        sns: "一度ちゃんと考えたい",
+        comparison: "条件を見ながら考えたい方へ",
+        description: "金融サービスの相談しやすさを伝える画像用コピーです。",
+        strongMain: "将来のお金を今見直す",
+        strongSub: "自分に合う選択肢を確認できます",
+        naturalMain: "お金のことを気軽に相談",
+        naturalSub: "将来に向けて考えやすい内容です",
+        premiumMain: "納得できる資産設計へ",
+        premiumSub: "専門家と一緒に考えられます",
+        empathyMain: "お金の不安、感じていませんか？",
+        empathySub: "ひとりで抱えず相談できます",
+        problemMain: "お金の判断を見直す",
+        problemSub: "今後に向けた選択肢を確認",
+        proofMain: "専門家に相談できる安心感",
+        proofSub: "将来に向けて一緒に考えられます",
+        limitedMain: "無料相談受付中",
+        limitedSub: "気になった今が見直しのタイミング",
+        dealMain: "将来に向けて賢く相談",
+        dealSub: "自分に合う考え方を確認できます",
+        snsMain: "一度ちゃんと考えたい",
+        snsSub: "将来のことを見直すきっかけに",
+        b2bMain: "金融相談をもっとスムーズに",
+        b2bSub: "必要な内容を確認しながら考えられます",
       },
       その他: {
         item: "サービス",
         place: "サービス",
         main: `${name}をチェック`,
-        naturalMain: `${name}をもっと身近に`,
-        trust: "多くの方に選ばれています",
-        beginner: "初めてでも始めやすいサービス",
-        benefit: "選ぶ理由がわかりやすい",
+        sub: "特徴と魅力がひと目でわかる",
+        benefit: "選ぶ理由を確認しやすい",
         problem: "何を選ぶか迷っている方へ",
-        sns: "これちょっと気になる",
-        check: "サービス内容をチェック",
-        compare: "違いがわかり選びやすい",
+        trust: "多くの方に選ばれています",
         limited: "今すぐチェック",
+        short: "詳しく見る",
+        sns: "これちょっと気になる",
+        comparison: "違いがわかり選びやすい",
+        description: "サービスの魅力を自然に伝える画像用コピーです。",
+        strongMain: `${name}を選ぶなら今`,
+        strongSub: "特徴と魅力をすぐチェック",
+        naturalMain: `${name}をもっと身近に`,
+        naturalSub: "気軽に始めやすいサービスです",
+        premiumMain: `上質な${name}`,
+        premiumSub: "シンプルで印象に残る見せ方",
+        empathyMain: "こんなサービスを探していませんか？",
+        empathySub: "自分に合う選択を見つけたい方へ",
+        problemMain: "選び方に迷ったら",
+        problemSub: "特徴と魅力を見ながら選べます",
+        proofMain: "多くの方に選ばれています",
+        proofSub: "選ばれている理由がひと目でわかる",
+        limitedMain: "今だけ特別案内",
+        limitedSub: "気になる今がチェックのタイミング",
+        dealMain: `${name}を賢く始める`,
+        dealSub: "気軽に始めやすい内容です",
+        snsMain: "これちょっと気になる",
+        snsSub: "思わず見たくなるサービスです",
+        b2bMain: `${name}で業務を見直す`,
+        b2bSub: "導入前に内容を確認しやすい案内です",
       },
     };
 
-    const w = industryWords[currentIndustry] || industryWords["その他"];
+    const words = industryWords[currentIndustry] || industryWords["その他"];
 
-    const makeBundle = (override: Partial<CopyBundle>): CopyBundle => ({
-      main: w.main,
-      sub: w.check,
-      benefit: w.benefit,
-      problem: w.problem,
-      trust: w.trust,
-      limited: w.limited,
-      short: campaignCta,
-      sns: w.sns,
-      comparison: w.compare,
-      description: `${safeAudience}に向けて、${w.item}の魅力が自然に伝わる画像用コピーを作ります。`,
-      ...override,
-    });
-
-    const campaignTemplates: Record<CampaignType, CopyBundle> = {
-      商品販売: makeBundle({
-        main: currentIndustry === "美容" ? "理想の自分を目指すなら" : `${w.item}を選ぶ理由`,
-        sub: currentIndustry === "飲食" ? "人気メニューを店頭でチェック" : w.check,
-        benefit: w.benefit,
-        trust: w.trust,
-        limited: currentIndustry === "EC" ? "今だけのキャンペーンをチェック" : w.limited,
-        short: "商品を見る",
-        description: `${safeAudience}に向けて、${w.item}を選びたくなる画像用コピーを作ります。`,
-      }),
-      店舗集客: makeBundle({
-        main: currentIndustry === "飲食" ? "今日行きたいお店に" : `初めてでも入りやすい${w.place}`,
-        sub: currentIndustry === "飲食" ? "人気メニューとお店の雰囲気をチェック" : `${w.place}の雰囲気をチェック`,
-        benefit: "来店前に雰囲気が伝わる",
-        problem: "行き先に迷っている方へ",
-        trust: currentIndustry === "飲食" ? "リピーターの多い人気店" : `通いやすさで選ばれている${w.place}`,
+    const baseByCampaign: Record<CampaignType, CopyBundle> = {
+      商品販売: {
+        main: words.main,
+        sub: words.sub,
+        benefit: words.benefit,
+        problem: words.problem,
+        trust: words.trust,
+        limited: words.limited,
+        short: currentIndustry === "飲食" ? "メニューを見る" : currentIndustry === "人材" ? "求人を見る" : currentIndustry === "不動産" ? "物件を見る" : "詳しく見る",
+        sns: words.sns,
+        comparison: words.comparison,
+        description: words.description,
+      },
+      店舗集客: {
+        main: currentIndustry === "飲食" ? "今日行きたいお店に" : `初めてでも入りやすい${words.place}`,
+        sub: currentIndustry === "飲食" ? "人気メニューとお店の雰囲気をチェック" : `${words.place}の雰囲気をチェック`,
+        benefit: currentIndustry === "飲食" ? "来店前にお店の魅力が伝わる" : "来店前に雰囲気が伝わる",
+        problem: currentIndustry === "飲食" ? "今日のお店選びに迷っている方へ" : "行き先に迷っている方へ",
+        trust: currentIndustry === "飲食" ? "リピーターの多い人気店" : `安心して立ち寄りやすい${words.place}`,
         limited: "今週行きたい場所をチェック",
         short: "店舗を見る",
         sns: currentIndustry === "飲食" ? "ここ、次行きたい" : "ここ、保存しておきたい",
         comparison: "雰囲気で選びたい方へ",
-        description: `${safeAudience}に向けて、来店したくなる画像用コピーを作ります。`,
-      }),
-      求人: makeBundle({
-        main: "自分らしく働ける環境へ",
-        sub: "仕事内容と働きやすさを確認",
-        benefit: "応募前に働く雰囲気がわかる",
+        description: "来店前に魅力が伝わる画像用コピーです。",
+      },
+      求人: {
+        main: "自分らしく働ける場所へ",
+        sub: "仕事内容と職場の雰囲気をチェック",
+        benefit: "応募前に働くイメージが持てる",
         problem: "今の働き方を見直したい方へ",
-        trust: "未経験から始めやすい仕事",
-        limited: "募集受付中",
-        short: "応募する",
+        trust: "働きやすさで選ばれている職場",
+        limited: "今だけ募集受付中",
+        short: "求人を見る",
         sns: "この職場ちょっと良さそう",
         comparison: "条件だけでなく働きやすさで選ぶ",
-        description: `${safeAudience}に向けて、応募したくなる求人コピーを作ります。`,
-      }),
-      サービス申込: makeBundle({
+        description: "求人の働きやすさと応募しやすさを伝える画像用コピーです。",
+      },
+      サービス申込: {
         main: `${name}を気軽に始める`,
-        sub: `${w.item}の内容をチェック`,
-        benefit: "申し込み前の不安を減らせる",
-        problem: "そろそろ見直したい方へ",
-        trust: `始めやすさで選ばれている${w.item}`,
+        sub: words.naturalSub,
+        benefit: words.benefit,
+        problem: safePoint ? `${safePoint}で迷っている方へ` : words.problem,
+        trust: words.trust,
         limited: "始めやすい今のうちに",
         short: "申し込む",
-        sns: "これなら始めやすそう",
-        comparison: "内容を見てから決められる",
-        description: `${safeAudience}に向けて、申し込みやすさが伝わる画像用コピーを作ります。`,
-      }),
-      リード獲得: makeBundle({
+        sns: words.sns,
+        comparison: words.comparison,
+        description: `${safeAudience}に向けて、申込前の不安を減らす画像用コピーです。`,
+      },
+      リード獲得: {
         main: "まずは無料で相談",
-        sub: "気になることだけ相談できます",
-        benefit: "自分に合う選択肢を確認できる",
+        sub: currentIndustry === "SaaS" ? "導入前の悩みを相談できます" : "相談前の不安を減らせます",
+        benefit: words.benefit,
         problem: "ひとりで判断しにくい方へ",
-        trust: "気軽に相談しやすい窓口です",
+        trust: currentIndustry === "飲食" ? "相談しやすい店舗案内です" : words.trust,
         limited: "無料相談を受付中",
         short: "相談する",
         sns: "相談だけできるのは助かる",
         comparison: "調べ続けるより、まず相談",
-        description: `${safeAudience}に向けて、相談しやすさが伝わる画像用コピーを作ります。`,
-      }),
-      LINE登録: makeBundle({
+        description: "相談しやすさが伝わる画像用コピーです。",
+      },
+      LINE登録: {
         main: "お得な案内をLINEで",
-        sub: "登録後のメリットがわかる",
+        sub: currentIndustry === "飲食" ? "限定メニューや最新案内が届きます" : "登録後のメリットがわかります",
         benefit: "最新の案内や特典を受け取りやすい",
         problem: "大事な案内を見逃したくない方へ",
-        trust: "登録後に届く内容がわかる",
+        trust: currentIndustry === "求人" ? "募集案内を受け取りやすい" : words.trust,
         limited: "LINE限定の案内をチェック",
         short: "LINE登録する",
         sns: "LINEで届くの便利そう",
         comparison: "探すよりLINEで受け取る",
-        description: `${safeAudience}に向けて、LINE登録のメリットが伝わる画像用コピーを作ります。`,
-      }),
-      資料請求: makeBundle({
+        description: "LINE登録のメリットが伝わる画像用コピーです。",
+      },
+      資料請求: {
         main: `${name}を資料で確認`,
-        sub: "導入前に知りたい内容を確認",
-        benefit: "導入前に必要な内容がわかる",
+        sub: currentIndustry === "SaaS" ? "導入前にサービス内容を確認" : `${words.item}の内容を資料で確認`,
+        benefit: currentIndustry === "SaaS" ? "導入前に内容を確認できる" : words.benefit,
         problem: "判断材料が足りず迷っている方へ",
-        trust: currentIndustry === "SaaS" ? "導入企業が増えている業務ツール" : w.trust,
+        trust: currentIndustry === "SaaS" ? "導入企業が増えている業務ツール" : words.trust,
         limited: "無料資料を今すぐチェック",
         short: "資料を見る",
         sns: "資料だけ見られるのは助かる",
         comparison: "資料を見てから選べる",
-        description: `${safeAudience}に向けて、資料請求につながる画像用コピーを作ります。`,
-      }),
-      アプリDL: makeBundle({
+        description: "資料請求につながる画像用コピーです。",
+      },
+      アプリDL: {
         main: `${name}で、もっと手軽に`,
         sub: "スマホでかんたんに使えるアプリ",
         benefit: "毎日の手間を少し減らせる",
@@ -918,145 +1128,164 @@ export default function Home() {
         short: "アプリで体験",
         sns: "このアプリ、普通に便利",
         comparison: "面倒な手順よりアプリでかんたんに",
-        description: `${safeAudience}に向けて、アプリの便利さが伝わる画像用コピーを作ります。`,
-      }),
-      ブランド認知: makeBundle({
-        main: currentIndustry === "不動産" ? "理想の暮らしを考えた住まい" : `${name}の魅力を知る`,
-        sub: currentIndustry === "不動産" ? "暮らしやすさと空間設計にこだわる" : `${w.item}の魅力がひと目でわかる`,
-        benefit: "価値観に合うブランドと出会える",
+        description: "アプリの便利さが伝わる画像用コピーです。",
+      },
+      ブランド認知: {
+        main: currentIndustry === "不動産" ? "理想の暮らしを叶える住まい" : `${name}の魅力を知る`,
+        sub: words.premiumSub,
+        benefit: words.benefit,
         problem: "自分に合う選択を探している方へ",
-        trust: "自然に印象へ残りやすい",
+        trust: currentIndustry === "飲食" ? "雰囲気の良さが伝わるお店です" : words.trust,
         limited: "今、注目したいブランド体験",
         short: `${name}を知る`,
-        sns: "この雰囲気、けっこう好き",
-        comparison: "価格だけでなく雰囲気で選ぶ",
-        description: `${safeAudience}に向けて、ブランドの印象が残る画像用コピーを作ります。`,
-      }),
-      イベント: makeBundle({
+        sns: words.sns,
+        comparison: currentIndustry === "不動産" ? "暮らしやすさで選ぶ" : words.comparison,
+        description: "ブランドの印象が残る画像用コピーです。",
+      },
+      イベント: {
         main: `${name}で特別な体験を`,
-        sub: "参加前に楽しみ方がイメージできる",
+        sub: currentIndustry === "飲食" ? "今だけ楽しめるメニューをチェック" : "参加前に楽しみ方がイメージできます",
         benefit: "今しかできない体験を楽しめる",
         problem: "週末の予定を探している方へ",
-        trust: "日時・場所・内容がわかりやすい",
+        trust: currentIndustry === "飲食" ? "お店の雰囲気も楽しめます" : words.trust,
         limited: "期間限定イベント開催中",
         short: "イベントを見る",
         sns: "これ、友だちと行きたい",
         comparison: "見るだけより参加して楽しむ",
-        description: `${safeAudience}に向けて、参加したくなる画像用コピーを作ります。`,
-      }),
-      その他: makeBundle({
-        main: `${name}をチェック`,
-        sub: `${w.item}の魅力がひと目でわかる`,
-        benefit: "選ぶ理由を確認しやすい",
-        problem: "何を選ぶか迷っている方へ",
-        trust: w.trust,
-        limited: "今すぐチェック",
-        short: "詳しく見る",
-        sns: "これちょっと気になる",
-        comparison: "違いがわかり選びやすい",
-        description: `${safeAudience}に向けて、特徴と選ぶ理由が伝わる画像用コピーを作ります。`,
-      }),
+        description: "参加したくなる画像用コピーです。",
+      },
+      その他: {
+        main: words.main,
+        sub: words.sub,
+        benefit: words.benefit,
+        problem: words.problem,
+        trust: words.trust,
+        limited: words.limited,
+        short: words.short,
+        sns: words.sns,
+        comparison: words.comparison,
+        description: words.description,
+      },
     };
 
-    const toneTemplates: Record<CopyTone, Partial<CopyBundle>> = {
+    const toneOverrides: Record<CopyTone, Partial<CopyBundle>> = {
       強め: {
-        main: currentCampaignType === "求人" ? "新しい働き方を始める" : currentCampaignType === "店舗集客" ? w.main : currentIndustry === "美容" ? "理想の自分を目指すなら" : `${w.item}を選ぶなら今`,
-        sub: currentCampaignType === "店舗集客" ? `${w.place}の魅力をチェック` : w.check,
+        main: words.strongMain,
+        sub: words.strongSub,
       },
       自然: {
-        main: w.naturalMain,
-        sub: currentCampaignType === "店舗集客" ? `${w.place}の雰囲気をチェック` : w.benefit,
+        main: words.naturalMain,
+        sub: words.naturalSub,
       },
       高級: {
-        main: currentIndustry === "美容" ? "ワンランク上のケア体験" : `上質な${w.item}`,
-        sub: currentIndustry === "飲食" ? "ゆっくり過ごせる上質な時間" : currentIndustry === "不動産" ? "暮らしやすさと空間設計にこだわる" : `上質な${w.item}を探している方へ`,
+        main: words.premiumMain,
+        sub: words.premiumSub,
       },
       共感: {
-        main: currentCampaignType === "求人" ? "今の働き方、見直しませんか？" : "その悩み、そろそろ手放しませんか？",
-        sub: `${safeAudience}に寄り添うやさしい案内`,
+        main: words.empathyMain,
+        sub: words.empathySub,
       },
       悩み解決: {
-        main: "その悩みに、次の選択を",
-        sub: safePoint ? `${safePoint}で迷っている方へ` : w.problem,
+        main: words.problemMain,
+        sub: safePoint ? `${safePoint}で迷っている方へ` : words.problemSub,
       },
       実績: {
-        main: currentCampaignType === "求人" ? "働きやすさで選ばれる職場" : w.trust,
-        sub: currentIndustry === "飲食" ? "リピーターの多い人気店" : `${w.item}が選ばれている理由`,
+        main: words.proofMain,
+        sub: words.proofSub,
+        trust: words.trust,
       },
       限定: {
-        main: currentCampaignType === "求人" ? "今だけ募集受付中" : currentIndustry === "飲食" ? "今週行きたい人気店" : "今だけ特別案内",
-        sub: w.limited,
-        limited: w.limited,
+        main: words.limitedMain,
+        sub: words.limitedSub,
+        limited: words.limited,
       },
       お得: {
-        main: currentIndustry === "飲食" ? "お得に楽しめる人気メニュー" : `${w.item}を賢く始める`,
-        sub: currentIndustry === "求人" ? "応募前に働きやすさをチェック" : "お得に始めたい方にぴったり",
+        main: words.dealMain,
+        sub: words.dealSub,
       },
       SNS風: {
-        main: currentCampaignType === "店舗集客" ? "ここ、保存しておきたい" : w.sns,
-        sub: currentIndustry === "飲食" ? "人気メニューをチェック" : w.check,
+        main: words.snsMain,
+        sub: words.snsSub,
+        sns: words.sns,
       },
       BtoB: {
-        main: currentCampaignType === "資料請求" ? `${name}を資料で確認` : currentIndustry === "SaaS" ? "業務をもっとスムーズに" : w.main,
-        sub: currentIndustry === "SaaS" ? "導入前に知りたい内容を確認" : w.check,
+        main: words.b2bMain,
+        sub: words.b2bSub,
       },
     };
 
-    const adTypeTemplates: Record<AdType, Partial<CopyBundle>> = {
+    const adTypeOverrides: Record<AdType, Partial<CopyBundle>> = {
       CV重視: {
-        trust: w.trust,
+        trust: words.trust,
         short: campaignCta,
       },
       CTR重視: {
-        main: currentIndustry === "飲食" ? "今日ここ行かない？" : "これ、気になりませんか？",
-        sub: currentCampaignType === "店舗集客" ? `${w.place}の雰囲気をチェック` : w.check,
+        main: currentIndustry === "飲食" ? "今日ここ行かない？" : words.snsMain,
+        sub: currentIndustry === "飲食" ? "人気メニューを今すぐチェック" : words.snsSub,
         short: "まずは見る",
-        sns: currentIndustry === "飲食" ? "ここ、保存しておきたい" : "気になって保存したくなる",
       },
       高級ブランド: {
-        main: currentIndustry === "美容" ? "ワンランク上のケア体験" : `上質な${w.item}`,
-        sub: currentIndustry === "不動産" ? "暮らしやすさと空間設計にこだわる" : `上質な${w.item}を探している方へ`,
-        benefit: "日常を少し上質にする選択",
-        comparison: "価格だけでなく価値で選ぶ",
-        sns: "この雰囲気、ちゃんと上品",
+        main: words.premiumMain,
+        sub: words.premiumSub,
+        benefit: words.benefit,
+        comparison: currentIndustry === "不動産" ? "暮らしやすさで選ぶ" : words.comparison,
       },
       UGC風: {
-        main: currentCampaignType === "求人" ? "この職場、ちょっと気になる" : w.sns,
-        sub: currentIndustry === "飲食" ? "人気メニューをチェック" : w.check,
-        problem: "もっと早く知りたかった方へ",
-        sns: currentCampaignType === "店舗集客" ? "ここ、保存しておきたい" : w.sns,
-        comparison: "リアルな雰囲気で選びやすい",
+        main: words.snsMain,
+        sub: words.snsSub,
+        sns: words.sns,
       },
       セール: {
-        main: currentCampaignType === "求人" ? "今だけ応募受付中" : currentIndustry === "飲食" ? "今だけ楽しめる人気メニュー" : "今だけ特別価格",
-        sub: currentIndustry === "飲食" ? "人気メニューをお得に楽しめる" : "今だけのキャンペーン実施中",
-        benefit: "今チェックする理由がわかる",
-        limited: w.limited,
+        main: currentIndustry === "求人" ? "今だけ募集受付中" : currentIndustry === "飲食" ? "期間限定メニュー登場" : "今だけ特別案内",
+        sub: currentIndustry === "求人"
+          ? "募集枠があるうちにチェック"
+          : currentIndustry === "飲食"
+            ? "今だけ楽しめるメニューをチェック"
+            : currentIndustry === "美容"
+              ? "美容ケアをお得に始めるチャンス"
+              : currentIndustry === "SaaS"
+                ? "無料資料を今すぐチェック"
+                : currentIndustry === "不動産"
+                  ? "最新物件を今すぐチェック"
+                  : currentIndustry === "教育"
+                    ? "無料体験を今すぐチェック"
+                    : currentIndustry === "医療"
+                      ? "相談予約を今すぐチェック"
+                      : currentIndustry === "金融"
+                        ? "無料相談を今すぐチェック"
+                        : "今だけの案内をチェック",
+        limited: words.limited,
         short: "今すぐ見る",
       },
       BtoB: {
-        main: currentCampaignType === "資料請求" ? `${name}を資料で確認` : currentIndustry === "SaaS" ? "業務をもっとスムーズに" : w.main,
-        sub: currentIndustry === "SaaS" ? "導入前に知りたい内容を確認" : w.check,
-        benefit: currentIndustry === "SaaS" ? "導入前に必要な内容を確認できる" : w.benefit,
-        problem: currentIndustry === "SaaS" ? "属人的な運用を見直したい方へ" : w.problem,
-        trust: currentIndustry === "SaaS" ? "導入企業が増えている業務ツール" : w.trust,
-        comparison: currentIndustry === "SaaS" ? "感覚ではなく資料で確認する" : w.compare,
+        main: words.b2bMain,
+        sub: words.b2bSub,
+        trust: currentIndustry === "SaaS" ? "導入企業が増えている業務ツール" : words.trust,
       },
     };
 
     return {
-      ...campaignTemplates[currentCampaignType],
-      ...toneTemplates[copyTone],
-      ...adTypeTemplates[currentAdType],
+      ...baseByCampaign[currentCampaignType],
+      ...adTypeOverrides[currentAdType],
+      ...toneOverrides[currentCopyTone],
       description: `${safeAudience}に向けて、目的と業種に合う画像用コピーを作ります。`,
     };
   };
+
   const generateCopies = () => {
     const name = product.trim() || "商品・サービス";
     const point = appeal.trim() || industryRule.mainHint;
     const audience = target.trim() || "検討中の方";
 
-    const rawCopy = buildCopyBundle(campaignType, resolvedIndustry, adType, name, point, audience);
+    const rawCopy = generateIndustryCopyTemplates(
+      campaignType,
+      resolvedIndustry,
+      adType,
+      copyTone,
+      name,
+      point,
+      audience
+    );
 
     const sanitized = (Object.keys(rawCopy) as Array<keyof CopyBundle>).reduce((next, key) => {
       const max = key === "main" ? instagramRule.mainMax : key === "sub" ? instagramRule.subMax : 80;
@@ -1102,18 +1331,17 @@ export default function Home() {
       setDesignCount(data.designCount || "3枚");
       setDarkMode(data.darkMode || false);
       setCopyTone(data.copyTone || "強め");
-      setMainCopy("");
-      setSubCopy("");
-      setCtaCopy("今すぐチェック");
-      setBenefitCopy("");
-      setProblemCopy("");
-      setTrustCopy("");
-      setLimitedCopy("");
-      setShortCopy("");
-      setSnsCopy("");
-      setComparisonCopy("");
-      setDescriptionCopy("");
-      setHasEditedCopy(false);
+      setMainCopy(data.mainCopy || "");
+      setSubCopy(data.subCopy || "");
+      setCtaCopy(data.ctaCopy || "今すぐチェック");
+      setBenefitCopy(data.benefitCopy || "");
+      setProblemCopy(data.problemCopy || "");
+      setTrustCopy(data.trustCopy || "");
+      setLimitedCopy(data.limitedCopy || "");
+      setShortCopy(data.shortCopy || "");
+      setSnsCopy(data.snsCopy || "");
+      setComparisonCopy(data.comparisonCopy || "");
+      setDescriptionCopy(data.descriptionCopy || "");
     }
 
     if (savedHistory) {

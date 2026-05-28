@@ -326,10 +326,10 @@ export default function Home() {
     if (campaignType === "サービス申込") return "申し込む";
     if (campaignType === "リード獲得") return "無料相談する";
     if (campaignType === "LINE登録") return "LINEで受け取る";
-    if (campaignType === "資料請求") return "資料を見る";
+    if (campaignType === "資料請求") return "無料で資料を見る";
     if (campaignType === "アプリDL") return "無料でダウンロード";
-    if (campaignType === "ブランド認知") return "ブランドを見る";
-    if (campaignType === "イベント") return "イベントを見る";
+    if (campaignType === "ブランド認知") return "コンセプトを見る";
+    if (campaignType === "イベント") return "イベント詳細を見る";
     return "詳しく見る";
   }, [campaignType]);
 
@@ -350,7 +350,7 @@ export default function Home() {
 
     if (campaignType === "商品販売") {
       return {
-        main: "購入につながる商品広告",
+        main: "購買意欲を高める商品広告",
         points: ["商品ベネフィットを一瞬で伝える", "価格・限定・使った後の変化を強調", "商品を主役にする"],
       };
     }
@@ -392,7 +392,7 @@ export default function Home() {
 
     if (campaignType === "ブランド認知") {
       return {
-        main: "印象に残るブランド広告",
+        main: "世界観を伝えるブランド広告",
         points: ["世界観・トーン・余白を重視", "ブランド名を覚えやすく見せる", "売り込み感を弱める"],
       };
     }
@@ -417,11 +417,11 @@ export default function Home() {
     const defaultCta = campaignCta;
 
     if (copyTone === "強め") {
-      setMainCopy(`${name}で今すぐ成果を変える`);
-      setSubCopy(`${point}を一瞬で伝え、行動したくなる広告にする`);
+      setMainCopy(`${name}で結果を変える`);
+      setSubCopy(`${point}をわかりやすく伝え、行動につなげる`);
       setCtaCopy(defaultCta);
-      setBenefitCopy(`${point}で、迷わず選ばれる理由を作る`);
-      setProblemCopy(`まだ${name}を試していないなら、機会損失かもしれません`);
+      setBenefitCopy(`${point}で、選びたくなる理由を伝える`);
+      setProblemCopy(`${name}をまだ試していない方へ`);
       setTrustCopy(`選ばれる理由がひと目で伝わる設計`);
       setLimitedCopy(`今だけのチャンスを逃さない`);
       setShortCopy(`成果を変える${name}`);
@@ -431,8 +431,8 @@ export default function Home() {
     }
 
     if (copyTone === "自然") {
-      setMainCopy(`${name}をもっと身近に`);
-      setSubCopy(`${point}を自然に伝え、SNSになじむ広告にする`);
+      setMainCopy(`${name}をもっと気軽に`);
+      setSubCopy(`${point}を自然に伝え、SNSにもなじむ表現に`);
       setCtaCopy(defaultCta);
       setBenefitCopy(`毎日の中で自然に使える${name}`);
       setProblemCopy(`無理なく続けられる方法を探している方へ`);
@@ -445,7 +445,7 @@ export default function Home() {
     }
 
     if (copyTone === "高級") {
-      setMainCopy(`上質な${name}を`);
+      setMainCopy(`ワンランク上の${name}`);
       setSubCopy(`${point}を洗練された世界観で伝える`);
       setCtaCopy(defaultCta);
       setBenefitCopy(`日常を一段上げる、上質な選択`);
@@ -454,40 +454,40 @@ export default function Home() {
       setLimitedCopy(`限られた方へ届けたい特別な価値`);
       setShortCopy(`上質を、あなたに`);
       setSnsCopy(`この上品さ、ちゃんと伝わる。`);
-      setComparisonCopy(`価格ではなく、価値で選ばれる`);
+      setComparisonCopy(`価格以上の価値を求める方へ`);
       setDescriptionCopy(`${audience}に向けて、高級感・信頼感・洗練された印象を重視したコピーです。`);
     }
 
     if (copyTone === "共感") {
-      setMainCopy(`その悩み、${name}で変えられる`);
+      setMainCopy(`その悩み、そろそろ手放しませんか？`);
       setSubCopy(`${audience}の気持ちに寄り添い、${point}をやさしく伝える`);
       setCtaCopy(defaultCta);
       setBenefitCopy(`無理せず、自分らしく変われる`);
-      setProblemCopy(`頑張っているのに、なかなか変わらないあなたへ`);
+      setProblemCopy(`頑張っているのに結果が出ない…そんな方へ`);
       setTrustCopy(`同じ悩みを持つ人に選ばれています`);
       setLimitedCopy(`始めるなら、今の気持ちが動いたタイミングで`);
       setShortCopy(`もう一人で悩まない`);
       setSnsCopy(`これ、私のことかも。`);
-      setComparisonCopy(`我慢ではなく、解決できる選択へ`);
+      setComparisonCopy(`我慢ではなく、前向きに見直す選択へ`);
       setDescriptionCopy(`${audience}の悩みや不安に共感し、行動への心理的ハードルを下げるコピーです。`);
     }
 
     if (copyTone === "悩み解決") {
-      setMainCopy(`${point}の悩みを解決`);
-      setSubCopy(`${name}で、今の課題をわかりやすく改善へ導く`);
+      setMainCopy(`${point}の悩みにアプローチ`);
+      setSubCopy(`${name}で、今の課題をわかりやすく見直す`);
       setCtaCopy(defaultCta);
       setBenefitCopy(`悩みを放置せず、具体的な一歩へ`);
       setProblemCopy(`こんな悩み、後回しにしていませんか？`);
       setTrustCopy(`課題から逆算したわかりやすい提案`);
       setLimitedCopy(`今なら始めやすいタイミング`);
-      setShortCopy(`悩みを、解決へ`);
-      setSnsCopy(`これで悩みがかなりラクになった。`);
-      setComparisonCopy(`悩み続けるより、解決策を選ぶ`);
-      setDescriptionCopy(`${audience}の課題を明確化し、${name}を解決策として提示するコピーです。`);
+      setShortCopy(`悩みに、前向きな一歩を`);
+      setSnsCopy(`これを知って、少しラクになった。`);
+      setComparisonCopy(`悩み続けるより、まずは見直す`);
+      setDescriptionCopy(`${audience}の課題を明確化し、${name}を前向きな選択肢として提示するコピーです。`);
     }
 
     if (copyTone === "実績") {
-      setMainCopy(`選ばれる${name}`);
+      setMainCopy(`多くの方に選ばれている${name}`);
       setSubCopy(`${point}と信頼感を伝え、比較検討中の不安を減らす`);
       setCtaCopy(defaultCta);
       setBenefitCopy(`選ばれている理由がわかる`);
@@ -501,7 +501,7 @@ export default function Home() {
     }
 
     if (copyTone === "限定") {
-      setMainCopy(`今だけ、${name}をお得に`);
+      setMainCopy(`今だけ特別価格`);
       setSubCopy(`${point}を期間限定感と一緒に強く訴求する`);
       setCtaCopy(defaultCta);
       setBenefitCopy(`今始める理由がある特別なチャンス`);
@@ -529,7 +529,7 @@ export default function Home() {
     }
 
     if (copyTone === "SNS風") {
-      setMainCopy(`これ、ほんとに便利`);
+      setMainCopy(`最近これ使ってる`);
       setSubCopy(`${name}の${point}を投稿風に自然に伝える`);
       setCtaCopy(defaultCta);
       setBenefitCopy(`使ってみたくなるリアルな魅力`);
@@ -538,12 +538,12 @@ export default function Home() {
       setLimitedCopy(`気になった人からチェック中`);
       setShortCopy(`これ、いいかも`);
       setSnsCopy(`最近使ってよかったもの。`);
-      setComparisonCopy(`広告っぽさより、リアルな共感で伝える`);
+      setComparisonCopy(`リアルな使用感が伝わる見せ方`);
       setDescriptionCopy(`${audience}に向けて、InstagramやTikTokになじむ自然な投稿風コピーです。`);
     }
 
     if (copyTone === "BtoB") {
-      setMainCopy(`${name}で業務を効率化`);
+      setMainCopy(`${name}で業務改善を加速`);
       setSubCopy(`${point}をわかりやすく伝え、問い合わせや資料請求につなげる`);
       setCtaCopy(defaultCta);
       setBenefitCopy(`業務負担を減らし、成果につながる仕組みへ`);
@@ -709,7 +709,7 @@ export default function Home() {
 
     return [
       "SNSや検索で情報収集する一般ユーザー",
-      "第一印象でメリットが伝わる広告に反応しやすい",
+      "短時間で価値が伝わる広告に反応しやすい",
       "難しい説明より、直感的に価値が伝わる表現が有効",
     ];
   }, [campaignType, target]);
@@ -735,23 +735,23 @@ export default function Home() {
 
   const ctaSuggestions = useMemo(() => {
     if (campaignType === "求人") return ["今すぐ応募", "募集要項を見る", "まずは相談", "職場を見てみる"];
-    if (campaignType === "店舗集客") return ["予約する", "店舗を見る", "空き状況を見る", "今すぐ来店"];
+    if (campaignType === "店舗集客") return ["予約する", "店舗を見る", "空き状況を見る", "来店予約はこちら"];
     if (campaignType === "商品販売") return ["今すぐ購入", "商品を見る", "限定価格を見る", "カートに入れる"];
     if (campaignType === "サービス申込") return ["申し込む", "無料で始める", "詳細を見る", "相談する"];
     if (campaignType === "リード獲得") return ["無料相談する", "診断する", "問い合わせる", "今すぐ相談"];
     if (campaignType === "LINE登録") return ["LINEで受け取る", "友だち追加", "無料特典を受け取る", "LINE登録する"];
-    if (campaignType === "資料請求") return ["資料を見る", "無料で資料請求", "導入事例を見る", "詳細資料を受け取る"];
+    if (campaignType === "資料請求") return ["無料で資料を見る", "無料で資料請求", "導入事例を見る", "詳細資料を受け取る"];
     if (campaignType === "アプリDL") return ["無料でダウンロード", "アプリを試す", "今すぐ使う", "ダウンロード"];
-    if (campaignType === "ブランド認知") return ["ブランドを見る", "世界観を見る", "詳しく見る", "ラインナップを見る"];
-    if (campaignType === "イベント") return ["イベントを見る", "参加する", "詳細を見る", "申し込む"];
+    if (campaignType === "ブランド認知") return ["コンセプトを見る", "ブランドサイトを見る", "世界観を見る", "ラインナップを見る"];
+    if (campaignType === "イベント") return ["イベント詳細を見る", "参加する", "詳細を見る", "申し込む"];
     return [campaignCta, "詳しく見る", "今すぐチェック", "詳細を見る"];
   }, [campaignType, campaignCta]);
 
   const ctrImprovements = useMemo(() => {
     const tips: string[] = [];
 
-    if (!product.trim()) tips.push("商品・サービス名を入力すると、広告内容が具体化できます。");
-    if (!target.trim()) tips.push("ターゲットを年齢・性別・悩みまで具体化するとCTRが上がりやすくなります。");
+    if (!product.trim()) tips.push("商品名を具体的にすると、広告の説得力が上がります。");
+    if (!target.trim()) tips.push("ターゲット像を具体化すると、クリック率改善につながります。");
     if (!appeal.trim()) tips.push("訴求を入力すると、広告で一番目立たせるべきメッセージが明確になります。");
     if (!mainCopy.trim()) tips.push("メインコピーを入力すると、バナーの第一印象が強くなります。");
     if (!ctaCopy.trim()) tips.push("CTAを入力すると、クリック行動を促しやすくなります。");

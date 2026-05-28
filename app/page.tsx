@@ -73,13 +73,6 @@ type Industry =
   | "金融"
   | "その他";
 
-type Platform =
-  | "自動最適化"
-  | "Instagram"
-  | "Facebook"
-  | "TikTok"
-  | "Google広告";
-
 type Language = "日本語" | "英語";
 
 type TabType =
@@ -187,16 +180,7 @@ const INDUSTRIES: Industry[] = [
   "その他",
 ];
 
-const PLATFORMS: Platform[] = [
-  "自動最適化",
-  "Instagram",
-  "Facebook",
-  "TikTok",
-  "Google広告",
-];
-
 type ResolvedIndustry = Exclude<Industry, "自動判定">;
-type ResolvedPlatform = Exclude<Platform, "自動最適化">;
 
 type CopyBundle = {
   main: string;
@@ -216,13 +200,6 @@ type IndustryRule = {
   benefitHint: string;
   trustHint: string;
   avoidWords: string[];
-};
-
-type PlatformRule = {
-  label: string;
-  mainMax: number;
-  subMax: number;
-  direction: string;
 };
 
 const INDUSTRY_RULES: Record<ResolvedIndustry, IndustryRule> = {
@@ -281,37 +258,10 @@ const INDUSTRY_RULES: Record<ResolvedIndustry, IndustryRule> = {
     avoidWords: ["必ず儲かる", "元本保証", "絶対"],
   },
   その他: {
-    mainHint: "魅力をわかりやすく伝える",
+    mainHint: "選ぶ理由が伝わる",
     benefitHint: "必要な情報が短時間で伝わる",
     trustHint: "目的に合わせて訴求を整理",
     avoidWords: ["必ず", "絶対"],
-  },
-};
-
-const PLATFORM_RULES: Record<ResolvedPlatform, PlatformRule> = {
-  Instagram: {
-    label: "Instagram向け",
-    mainMax: 18,
-    subMax: 34,
-    direction: "世界観・共感・短い言葉を重視",
-  },
-  Facebook: {
-    label: "Facebook向け",
-    mainMax: 22,
-    subMax: 42,
-    direction: "信頼感・説明力・比較検討を重視",
-  },
-  TikTok: {
-    label: "TikTok向け",
-    mainMax: 16,
-    subMax: 30,
-    direction: "UGC感・会話感・一瞬の引きを重視",
-  },
-  Google広告: {
-    label: "Google広告向け",
-    mainMax: 20,
-    subMax: 38,
-    direction: "悩み・ベネフィット・CTAを直球で訴求",
   },
 };
 
@@ -336,19 +286,11 @@ const detectIndustry = (text: string, campaignType: CampaignType, adType: AdType
   return "その他";
 };
 
-const detectPlatform = (campaignType: CampaignType, adType: AdType, size: BannerSize): ResolvedPlatform => {
-  if (adType === "UGC風") return "TikTok";
-  if (adType === "BtoB" || campaignType === "資料請求" || campaignType === "リード獲得") return "Facebook";
-  if (size === "1080×1920") return "TikTok";
-  if (size === "1200×628") return "Facebook";
-  return "Instagram";
-};
-
 const sanitizeAdCopy = (value: string, avoidWords: string[]) => {
   const replacements: Record<string, string> = {
     実現: "形に",
     変革: "見直し",
-    解決: "サポート",
+    解決: "見直し",
     改善: "見直し",
     効果抜群: "実感しやすい",
     必ず: "しっかり",
@@ -522,7 +464,6 @@ export default function Home() {
   const [campaignType, setCampaignType] = useState<CampaignType>("商品販売");
   const [adType, setAdType] = useState<AdType>("CV重視");
   const [industry, setIndustry] = useState<Industry>("自動判定");
-  const [platform, setPlatform] = useState<Platform>("自動最適化");
   const [language, setLanguage] = useState<Language>("日本語");
   const [size, setSize] = useState<BannerSize>("1080×1080");
   const [designCount, setDesignCount] = useState<DesignCount>("3枚");
@@ -583,11 +524,14 @@ export default function Home() {
 
   const resolvedIndustry = industry === "自動判定" ? detectedIndustry : industry;
 
-  const resolvedPlatform = platform === "自動最適化" ? detectPlatform(campaignType, adType, size) : platform;
-
   const industryRule = INDUSTRY_RULES[resolvedIndustry] || INDUSTRY_RULES["その他"];
 
-  const platformRule = PLATFORM_RULES[resolvedPlatform];
+  const instagramRule = {
+    label: "Instagram向け",
+    mainMax: 18,
+    subMax: 34,
+    direction: "世界観・共感・短い言葉を重視",
+  };
 
   const copyLengthScore = useMemo(
     () => getCopyLengthScore(mainCopy, subCopy, ctaCopy),
@@ -685,276 +629,334 @@ export default function Home() {
     };
   }, [campaignType]);
 
+  const buildCopyBundle = (
+    currentCampaignType: CampaignType,
+    currentIndustry: ResolvedIndustry,
+    currentAdType: AdType,
+    name: string,
+    point: string,
+    audience: string
+  ): CopyBundle => {
+    const safePoint = point.trim() || industryRule.mainHint;
+    const safeAudience = audience.trim() || "検討中の方";
+
+    const baseByCampaign: Record<CampaignType, CopyBundle> = {
+      商品販売: {
+        main: `${name}を選ぶ理由`,
+        sub: "使いやすさと魅力がひと目で伝わる商品案内",
+        benefit: "購入後のイメージが自然に伝わる",
+        problem: "どれを選ぶか迷っている方へ",
+        trust: "レビュー感と使いやすさを見せる構成",
+        limited: "今だけの案内をチェック",
+        short: `${name}を見る`,
+        sns: "これ、ちょっと気になる。",
+        comparison: "価格だけでなく使いやすさで選ぶ",
+        description: `${safeAudience}に向けて、${name}の魅力と選ぶ理由を短く伝えるコピーです。`,
+      },
+      店舗集客: {
+        main: `近くで楽しむ${name}`,
+        sub: "雰囲気と通いやすさが伝わる店舗案内",
+        benefit: "来店前にお店の魅力が伝わる",
+        problem: "行き先に迷っている方へ",
+        trust: "雰囲気・口コミ感・場所のわかりやすさを重視",
+        limited: "今週行きたいお店をチェック",
+        short: "行ってみる",
+        sns: "ここ、保存しておきたい。",
+        comparison: "なんとなく選ぶより雰囲気で選ぶ",
+        description: `${safeAudience}に向けて、来店理由と店舗の魅力を伝えるコピーです。`,
+      },
+      求人: {
+        main: "自分らしく働ける場所へ",
+        sub: "仕事内容と働きやすさが伝わる求人案内",
+        benefit: "応募前に働くイメージが持てる",
+        problem: "今の働き方を見直したい方へ",
+        trust: "仕事内容・待遇・職場の雰囲気を明確に見せる",
+        limited: "募集枠があるうちにチェック",
+        short: "応募を見る",
+        sns: "この職場、ちょっと気になる。",
+        comparison: "条件だけでなく働きやすさで選ぶ",
+        description: `${safeAudience}に向けて、働くメリットと応募しやすさを伝える求人コピーです。`,
+      },
+      サービス申込: {
+        main: `${name}を気軽に始める`,
+        sub: "はじめてでも内容がわかりやすいサービス案内",
+        benefit: "申込前の不安を減らせる",
+        problem: "そろそろ見直したい方へ",
+        trust: "内容・流れ・安心材料を整理して見せる",
+        limited: "始めやすい今のうちに",
+        short: "申し込む",
+        sns: "これなら始めやすそう。",
+        comparison: "迷うより、まず内容を見て決める",
+        description: `${safeAudience}に向けて、申込前に知りたい情報を整理したコピーです。`,
+      },
+      リード獲得: {
+        main: "まずは無料で相談",
+        sub: "相談するメリットがすぐに伝わる案内",
+        benefit: "自分に合う選択肢を確認できる",
+        problem: "ひとりで判断しにくい方へ",
+        trust: "専門性と相談しやすさを重視",
+        limited: "無料相談を受付中",
+        short: "無料相談する",
+        sns: "相談だけできるのは助かる。",
+        comparison: "調べ続けるより、まず相談する",
+        description: `${safeAudience}に向けて、問い合わせや無料相談への心理的ハードルを下げるコピーです。`,
+      },
+      LINE登録: {
+        main: "お得な情報をLINEで",
+        sub: "登録するメリットがすぐに伝わる案内",
+        benefit: "最新情報や特典を受け取りやすい",
+        problem: "大事な案内を見逃したくない方へ",
+        trust: "登録後に受け取れる内容を明確に見せる",
+        limited: "LINE限定情報をチェック",
+        short: "LINE登録する",
+        sns: "LINEで届くの便利そう。",
+        comparison: "探すよりLINEで受け取る",
+        description: `${safeAudience}に向けて、LINE登録の手軽さと特典を伝えるコピーです。`,
+      },
+      資料請求: {
+        main: `${name}を資料で確認`,
+        sub: "導入前に知りたい情報をまとめて確認",
+        benefit: "比較検討に必要な情報が手に入る",
+        problem: "判断材料が足りず迷っている方へ",
+        trust: "特徴・料金・事例を整理して見せる",
+        limited: "無料資料を今すぐチェック",
+        short: "無料資料を見る",
+        sns: "資料だけ見られるのは助かる。",
+        comparison: "感覚ではなく資料で比較する",
+        description: `${safeAudience}に向けて、資料請求で得られる情報と比較しやすさを伝えるコピーです。`,
+      },
+      アプリDL: {
+        main: `${name}で、もっと手軽に`,
+        sub: "スマホでかんたんに使えるアプリ案内",
+        benefit: "毎日の手間を少し減らせる",
+        problem: "もっと手軽に済ませたい方へ",
+        trust: "使いやすさと便利さを短く見せる",
+        limited: "無料で始められる今のうちに",
+        short: "アプリで体験",
+        sns: "このアプリ、普通に便利。",
+        comparison: "面倒な手順よりアプリでかんたんに",
+        description: `${safeAudience}に向けて、アプリの手軽さと使うメリットを伝えるコピーです。`,
+      },
+      ブランド認知: {
+        main: `${name}の魅力を知る`,
+        sub: "ブランドらしさが自然に伝わるビジュアル訴求",
+        benefit: "価値観に合うブランドと出会える",
+        problem: "自分に合う選択を探している方へ",
+        trust: "売り込みすぎず印象に残す構成",
+        limited: "今、注目したいブランド体験",
+        short: `${name}を知る`,
+        sns: "この雰囲気、けっこう好き。",
+        comparison: "価格だけでなく雰囲気で選ぶ",
+        description: `${safeAudience}に向けて、ブランドの魅力と印象を伝えるコピーです。`,
+      },
+      イベント: {
+        main: `${name}で特別な体験を`,
+        sub: "参加したくなる理由が伝わるイベント案内",
+        benefit: "今しかできない体験を楽しめる",
+        problem: "週末の予定を探している方へ",
+        trust: "日時・場所・参加メリットを明確に見せる",
+        limited: "席数・期間限定のイベントをチェック",
+        short: "イベントを見る",
+        sns: "これ、友だちと行きたい。",
+        comparison: "見るだけより参加して楽しむ",
+        description: `${safeAudience}に向けて、イベントの楽しさと参加メリットを伝えるコピーです。`,
+      },
+      その他: {
+        main: `${name}をチェック`,
+        sub: "魅力と選ぶ理由が短く伝わる案内",
+        benefit: "短時間で価値が伝わる",
+        problem: "何を選ぶか迷っている方へ",
+        trust: "目的に合わせて情報を整理する",
+        limited: "気になった今がチェックのタイミング",
+        short: `${name}を見る`,
+        sns: "これ、ちょっと気になる。",
+        comparison: "比べて選びやすい見せ方",
+        description: `${safeAudience}に向けて、${name}の魅力を短く整理したコピーです。`,
+      },
+    };
+
+    const industryCopy: Partial<Record<ResolvedIndustry, Partial<CopyBundle>>> = {
+      美容: {
+        main: currentCampaignType === "店舗集客" ? "通いやすい美容サロン" : "毎日のケアをもっと気軽に",
+        sub: "続けやすさにこだわった美容アイテム",
+        benefit: "自分に合うケアを見つけやすい",
+        problem: "今のケアに物足りなさを感じている方へ",
+        trust: "清潔感と口コミ感が伝わる見せ方",
+        sns: "このケア、続けやすそう。",
+      },
+      SaaS: {
+        main: currentCampaignType === "資料請求" ? `${name}を資料で比較` : "業務改善をもっとスムーズに",
+        sub: "導入前に知りたい情報をまとめて確認",
+        benefit: "現場の手間を減らし、運用を整えやすい",
+        problem: "今の運用にムダを感じている方へ",
+        trust: "導入実績とセキュリティを重視した訴求",
+        sns: "こういうツール、探してた。",
+      },
+      不動産: {
+        main: "理想の暮らしに近づく住まい",
+        sub: "立地・価格・暮らしやすさをまとめて確認",
+        benefit: "納得して住まいを選びやすい",
+        problem: "物件選びで迷っている方へ",
+        trust: "相談しやすさと実績が伝わる見せ方",
+        sns: "この部屋、ちょっと見てみたい。",
+      },
+      教育: {
+        main: "学びを次の一歩へ",
+        sub: "続けやすい学習環境が伝わる案内",
+        benefit: "自分のペースで成長を目指せる",
+        problem: "学び直しを始めたい方へ",
+        trust: "カリキュラムと受講サポートを明確に見せる",
+        sns: "これなら続けられそう。",
+      },
+      飲食: {
+        main: currentCampaignType === "店舗集客" ? `今日行きたい${name}` : "できたてのおいしさを楽しむ",
+        sub: "人気メニューとお店の雰囲気が伝わる案内",
+        benefit: "来店前に食べたい理由が伝わる",
+        problem: "今日のお店選びに迷っている方へ",
+        trust: "メニュー写真と口コミ感を重視した見せ方",
+        sns: "ここ、次行きたい。",
+      },
+      EC: {
+        main: "欲しいが見つかる",
+        sub: "価格・レビュー・使いやすさを見比べやすい案内",
+        benefit: "買う前に選ぶ理由がわかる",
+        problem: "買う決め手がほしい方へ",
+        trust: "レビュー感と配送情報が伝わる見せ方",
+        sns: "これ、買ってよかった系。",
+      },
+      人材: {
+        main: "自分らしく働ける場所へ",
+        sub: "仕事内容と職場の雰囲気が伝わる求人案内",
+        benefit: "応募前に働くイメージが持てる",
+        problem: "今の働き方を見直したい方へ",
+        trust: "待遇・仕事内容・職場環境を明確に見せる",
+        sns: "この職場、ちょっと良さそう。",
+      },
+      医療: {
+        main: "まずは気軽に相談を",
+        sub: "不安なことを相談しやすい案内",
+        benefit: "悩みを整理して相談しやすい",
+        problem: "不安をそのままにしたくない方へ",
+        trust: "丁寧さと専門性が伝わる見せ方",
+        sns: "相談しやすそうで安心。",
+      },
+      金融: {
+        main: "将来のお金を見直す",
+        sub: "比較検討に必要な情報を整理して確認",
+        benefit: "自分に合う選択肢を考えやすい",
+        problem: "お金の判断に迷っている方へ",
+        trust: "リスク説明と専門性が伝わる見せ方",
+        sns: "一度ちゃんと見直したい。",
+      },
+    };
+
+    const adTypeCopy: Record<AdType, Partial<CopyBundle>> = {
+      CV重視: {
+        main: currentCampaignType === "商品販売" ? `${name}を選ぶ理由` : baseByCampaign[currentCampaignType].main,
+        sub: "迷わず次の行動に進めるシンプルな案内",
+        short: campaignCta,
+        trust: "不安を減らし、行動しやすくする構成",
+      },
+      CTR重視: {
+        main: currentIndustry === "飲食" ? "今日ここ行かない？" : "これ、気になりませんか？",
+        sub: "思わず続きを見たくなる短い見出し",
+        short: "まずは見る",
+        sns: "気になって保存したくなる。",
+      },
+      高級ブランド: {
+        main: `ワンランク上の${name}`,
+        sub: "上質感と余白で魅力を印象づける案内",
+        benefit: "日常を少し上質にする選択",
+        comparison: "価格だけでなく価値で選ぶ",
+        sns: "この雰囲気、ちゃんと上品。",
+      },
+      UGC風: {
+        main: currentCampaignType === "求人" ? "この職場、ちょっと気になる" : "最近これ使ってる",
+        sub: "投稿のように自然に見える一言訴求",
+        problem: "もっと早く知りたかったと思える選択",
+        sns: currentCampaignType === "店舗集客" ? "ここ、保存しておきたい。" : "最近使ってよかったもの。",
+        comparison: "広告っぽさよりリアルな使用感で見せる",
+      },
+      セール訴求: {
+        main: currentCampaignType === "求人" ? "今だけ応募受付中" : "今だけ特別案内",
+        sub: "限定感とメリットがすぐに伝わる案内",
+        benefit: "今チェックする理由が伝わる",
+        limited: "期間限定の案内をチェック",
+        short: "今すぐチェック",
+      },
+      BtoB: {
+        main: currentCampaignType === "資料請求" ? `${name}を資料で比較` : `${name}で業務を見直す`,
+        sub: "導入前に知りたい情報を整理して確認",
+        benefit: "検討に必要な情報をまとめて確認できる",
+        problem: "属人的な運用を見直したい方へ",
+        trust: "法人導入に必要な信頼感を重視",
+        comparison: "感覚ではなく資料で比較する",
+      },
+    };
+
+    const copyToneCopy: Record<CopyTone, Partial<CopyBundle>> = {
+      強め: {
+        main: currentCampaignType === "求人" ? "今の働き方を変えるなら" : `${name}を選ぶなら今`,
+        sub: "見た瞬間に魅力が伝わる直球コピー",
+      },
+      自然: {
+        main: currentIndustry === "美容" ? "毎日のケアをもっと気軽に" : `${name}をもっと身近に`,
+        sub: "Instagramになじむ自然な見せ方",
+      },
+      高級: {
+        main: `ワンランク上の${name}`,
+        sub: "上質感と余白で魅力を伝える案内",
+      },
+      共感: {
+        main: currentCampaignType === "求人" ? "今の働き方、見直しませんか？" : "その悩み、そろそろ手放しませんか？",
+        sub: `${safeAudience}の気持ちに寄り添う案内`,
+      },
+      悩み解決: {
+        main: "その悩みに、次の選択を",
+        sub: "今の困りごとを整理して考えやすくする案内",
+      },
+      実績: {
+        main: `選ばれている${name}`,
+        sub: "信頼感と選ばれる理由が伝わる案内",
+      },
+      限定: {
+        main: currentCampaignType === "求人" ? "今だけ募集受付中" : "今だけ特別案内",
+        sub: "期間限定のメリットが伝わる案内",
+        limited: "期間限定の案内をチェック",
+      },
+      お得: {
+        main: `${name}を賢く始める`,
+        sub: "お得に始めたい方へ向けた案内",
+      },
+      SNS風: {
+        main: currentCampaignType === "店舗集客" ? "ここ、保存しておきたい" : baseByCampaign[currentCampaignType].sns,
+        sub: "投稿になじむリアルな一言コピー",
+      },
+      BtoB: {
+        main: currentCampaignType === "資料請求" ? `${name}を資料で比較` : `${name}で業務を見直す`,
+        sub: "導入検討に必要な情報が伝わる案内",
+      },
+    };
+
+    return {
+      ...baseByCampaign[currentCampaignType],
+      ...(industryCopy[currentIndustry] || {}),
+      ...adTypeCopy[currentAdType],
+      ...copyToneCopy[copyTone],
+      description: `${baseByCampaign[currentCampaignType].description} 主な訴求は「${safePoint}」。業界は「${currentIndustry}」、コピータイプは「${copyTone}」、広告タイプは「${currentAdType}」です。`,
+    };
+  };
+
   const generateCopies = () => {
     const name = product.trim() || "商品・サービス";
     const point = appeal.trim() || industryRule.mainHint;
     const audience = target.trim() || "検討中の方";
-    const defaultCta = campaignCta;
 
-    const campaignCopies: Record<CampaignType, CopyBundle> = {
-      商品販売: {
-        main: `${name}の魅力を今すぐチェック`,
-        sub: `${point}が伝わる、買う理由がわかる商品訴求`,
-        benefit: `使うほど${industryRule.benefitHint}`,
-        problem: `いつもの選択に、少し物足りなさを感じていませんか？`,
-        trust: `${industryRule.trustHint}した見せ方`,
-        limited: `今だけの特別オファーをチェック`,
-        short: `${name}を見る`,
-        sns: `最近これ、ちょっと気になる。`,
-        comparison: `迷ったら、使いやすさで選ぶ`,
-        description: `${audience}に向けて、${name}の${point}と購入後のメリットをわかりやすく伝える商品販売向けコピーです。`,
-      },
-      店舗集客: {
-        main: `近くで見つかる${name}`,
-        sub: `${point}が伝わる、来店したくなる店舗訴求`,
-        benefit: `気軽に立ち寄れて、満足できる体験を`,
-        problem: `どこに行くか迷っている方へ`,
-        trust: `雰囲気・口コミ感・通いやすさが伝わる設計`,
-        limited: `今なら予約しやすいタイミング`,
-        short: `行ってみたい${name}`,
-        sns: `ここ、ちょっと行ってみたい。`,
-        comparison: `なんとなく選ぶより、雰囲気で選ぶ`,
-        description: `${audience}に向けて、店舗の雰囲気・通いやすさ・${point}を伝え、予約や来店につなげるコピーです。`,
-      },
-      求人: {
-        main: `${name}で新しい働き方を`,
-        sub: `${point}が伝わる、応募しやすい求人訴求`,
-        benefit: `自分らしく働ける環境を見つける`,
-        problem: `今の働き方に、少し違和感がある方へ`,
-        trust: `仕事内容・待遇・雰囲気がわかる安心設計`,
-        limited: `募集枠がある今のうちにチェック`,
-        short: `新しい一歩をここから`,
-        sns: `この職場、ちょっと気になる。`,
-        comparison: `条件だけでなく、働きやすさで選ぶ`,
-        description: `${audience}に向けて、仕事内容・働きやすさ・${point}を伝え、応募のハードルを下げる求人向けコピーです。`,
-      },
-      サービス申込: {
-        main: `${name}で今の課題を見直す`,
-        sub: `${point}をわかりやすく伝え、申込につなげる`,
-        benefit: `悩みを整理して、次の一歩へ進める`,
-        problem: `その課題、後回しにしていませんか？`,
-        trust: `はじめてでも安心して検討できるサービス訴求`,
-        limited: `今なら始めやすいタイミング`,
-        short: `まずは気軽に申込`,
-        sns: `これなら無理なく始められそう。`,
-        comparison: `悩み続けるより、まずは試してみる`,
-        description: `${audience}に向けて、${name}の${point}と申込後のメリットを具体的に伝えるコピーです。`,
-      },
-      リード獲得: {
-        main: `${name}の相談、まずは無料で`,
-        sub: `${point}を伝え、問い合わせのハードルを下げる`,
-        benefit: `専門的な情報を、気軽に確認できる`,
-        problem: `何から相談すればいいかわからない方へ`,
-        trust: `相談前の不安を減らす信頼感ある訴求`,
-        limited: `無料相談できる今がチャンス`,
-        short: `まずは無料相談`,
-        sns: `相談だけでもよさそう。`,
-        comparison: `一人で迷うより、まずは相談`,
-        description: `${audience}に向けて、無料相談・診断・問い合わせにつながる安心感重視のコピーです。`,
-      },
-      LINE登録: {
-        main: `${name}の情報をLINEで受け取る`,
-        sub: `${point}や限定情報を、スマホで手軽にチェック`,
-        benefit: `お得な情報を見逃さず受け取れる`,
-        problem: `キャンペーン情報を見逃していませんか？`,
-        trust: `登録後のメリットがすぐに伝わる設計`,
-        limited: `LINE登録者限定の特典をチェック`,
-        short: `LINEでかんたん登録`,
-        sns: `LINEで届くの、便利そう。`,
-        comparison: `探すより、LINEで受け取る`,
-        description: `${audience}に向けて、LINE登録の手軽さ・特典・${point}を伝えるコピーです。`,
-      },
-      資料請求: {
-        main: `${name}の資料を無料で確認`,
-        sub: `${point}がわかる資料で、比較検討をスムーズに`,
-        benefit: `導入前に必要な情報をまとめて確認`,
-        problem: `比較材料が足りず、判断に迷っていませんか？`,
-        trust: `${industryRule.trustHint}した資料訴求`,
-        limited: `無料資料を今すぐチェック`,
-        short: `無料資料で比較する`,
-        sns: `資料だけ見られるのはありがたい。`,
-        comparison: `感覚ではなく、資料で比較する`,
-        description: `${audience}に向けて、資料請求のメリット・得られる情報・信頼感を伝えるコピーです。`,
-      },
-      アプリDL: {
-        main: `${name}で、もっと手軽に`,
-        sub: `${point}をアプリでかんたんに体験`,
-        benefit: `スマホひとつで、毎日をもっと便利に`,
-        problem: `面倒な操作や手間を減らしたい方へ`,
-        trust: `使いやすさと便利さが伝わるアプリ訴求`,
-        limited: `無料で始められる今のうちに`,
-        short: `今すぐアプリで体験`,
-        sns: `このアプリ、普通に便利。`,
-        comparison: `面倒な手順より、アプリでかんたんに`,
-        description: `${audience}に向けて、アプリの便利さ・手軽さ・DL後の体験価値を伝えるコピーです。`,
-      },
-      ブランド認知: {
-        main: `${name}の世界観を、もっと近くに`,
-        sub: `${point}を通じて、ブランドの魅力を印象づける`,
-        benefit: `価値観に合うブランドと出会える`,
-        problem: `自分に合う選択を探している方へ`,
-        trust: `売り込みすぎず、世界観で記憶に残す設計`,
-        limited: `今、注目したいブランド体験`,
-        short: `${name}という選択`,
-        sns: `この雰囲気、けっこう好き。`,
-        comparison: `価格ではなく、世界観で選ぶ`,
-        description: `${audience}に向けて、${name}の世界観・価値観・${point}を印象的に伝えるブランド認知向けコピーです。`,
-      },
-      イベント: {
-        main: `${name}で特別な体験を`,
-        sub: `${point}が伝わる、参加したくなるイベント訴求`,
-        benefit: `ここでしか得られない体験を楽しめる`,
-        problem: `週末や空き時間の予定を探している方へ`,
-        trust: `日時・場所・参加メリットが伝わる安心設計`,
-        limited: `席数・期間限定のイベントをチェック`,
-        short: `今だけのイベント体験`,
-        sns: `これ、友だちと行きたい。`,
-        comparison: `見るだけより、参加して楽しむ`,
-        description: `${audience}に向けて、イベントの楽しさ・限定感・参加メリットを伝えるコピーです。`,
-      },
-      その他: {
-        main: `${name}の魅力をわかりやすく`,
-        sub: `${point}を軸に、次の行動につながる広告へ`,
-        benefit: `${industryRule.benefitHint}`,
-        problem: `伝えたい魅力がうまく届いていない方へ`,
-        trust: `${industryRule.trustHint}した広告訴求`,
-        limited: `気になった今がチェックのタイミング`,
-        short: `${name}をチェック`,
-        sns: `これ、ちょっと気になる。`,
-        comparison: `伝わりにくさを減らし、次の行動へ`,
-        description: `${audience}に向けて、${name}の${point}をわかりやすく伝える汎用コピーです。`,
-      },
-    };
+    const rawCopy = buildCopyBundle(campaignType, resolvedIndustry, adType, name, point, audience);
 
-    const copy: CopyBundle = { ...campaignCopies[campaignType] };
-
-    if (resolvedIndustry !== "その他") {
-      copy.benefit = industryRule.benefitHint;
-      copy.trust = industryRule.trustHint;
-      if (campaignType === "その他") copy.main = industryRule.mainHint;
-    }
-
-    if (adType === "CTR重視") {
-      copy.main = copyTone === "SNS風" ? copy.sns : `${point}、気になりませんか？`;
-      copy.sub = `${name}の魅力を一瞬で伝え、クリックしたくなる見せ方に`;
-      copy.short = `まずはチェック`;
-    }
-
-    if (adType === "CV重視") {
-      copy.main = campaignType === "商品販売" ? `${name}を今すぐチェック` : copy.main;
-      copy.sub = `${point}を具体的に伝え、次の行動につなげる`;
-      copy.trust = `不安を減らし、行動しやすくする安心訴求`;
-    }
-
-    if (adType === "高級ブランド") {
-      copy.main = `ワンランク上の${name}`;
-      copy.sub = `${point}を洗練された世界観で伝える`;
-      copy.benefit = `日常を一段上げる、上質な選択`;
-      copy.comparison = `価格以上の価値を求める方へ`;
-      copy.sns = `この雰囲気、ちゃんと上品。`;
-    }
-
-    if (adType === "UGC風") {
-      copy.main = `最近これ使ってる`;
-      copy.sub = `${name}の${point}を投稿風に自然に伝える`;
-      copy.problem = `もっと早く知りたかった、と思える選択`;
-      copy.sns = `最近使ってよかったもの。`;
-      copy.comparison = `リアルな使用感が伝わる見せ方`;
-    }
-
-    if (adType === "セール訴求") {
-      copy.main = `今だけ特別価格`;
-      copy.sub = `${point}をお得感と限定感でわかりやすく伝える`;
-      copy.benefit = `今始める理由がある特別なチャンス`;
-      copy.limited = `期間限定・数量限定の特別オファー`;
-      copy.short = `今だけ限定`;
-    }
-
-    if (adType === "BtoB") {
-      copy.main = `${name}で業務改善を加速`;
-      copy.sub = `${point}をわかりやすく伝え、問い合わせや資料請求につなげる`;
-      copy.benefit = `業務負担を減らし、成果につながる仕組みへ`;
-      copy.problem = `今の業務フローに、ムダが残っていませんか？`;
-      copy.trust = `法人導入に必要な信頼感を重視`;
-      copy.comparison = `属人的な運用から、仕組み化された運用へ`;
-    }
-
-    if (copyTone === "強め") {
-      copy.main = adType === "高級ブランド" || adType === "UGC風" || adType === "セール訴求" ? copy.main : `${name}で結果を変える`;
-      copy.sub = `${point}をわかりやすく伝え、行動につなげる`;
-    }
-
-    if (copyTone === "自然") {
-      copy.main = adType === "UGC風" ? copy.main : `${name}をもっと気軽に`;
-      copy.sub = `${point}を自然に伝え、SNSにもなじむ表現に`;
-    }
-
-    if (copyTone === "高級") {
-      copy.main = `ワンランク上の${name}`;
-      copy.sub = `${point}を洗練された世界観で伝える`;
-    }
-
-    if (copyTone === "共感") {
-      copy.main = campaignType === "求人" ? `今の働き方、見直しませんか？` : `その悩み、そろそろ手放しませんか？`;
-      copy.sub = `${audience}の気持ちに寄り添い、${point}をやさしく伝える`;
-    }
-
-    if (copyTone === "悩み解決") {
-      copy.main = `${point}の悩みにアプローチ`;
-      copy.sub = `${name}で、今の課題をわかりやすく見直す`;
-    }
-
-    if (copyTone === "実績") {
-      copy.main = `多くの方に選ばれている${name}`;
-      copy.sub = `${point}と信頼感を伝え、比較検討中の不安を減らす`;
-    }
-
-    if (copyTone === "限定") {
-      copy.main = `今だけ特別価格`;
-      copy.sub = `${point}を期間限定感と一緒に強く訴求する`;
-      copy.limited = `期間限定・数量限定の特別オファー`;
-    }
-
-    if (copyTone === "お得") {
-      copy.main = `${name}を賢く始める`;
-      copy.sub = `${point}をお得感とわかりやすさで伝える`;
-    }
-
-    if (copyTone === "SNS風") {
-      copy.main = resolvedPlatform === "TikTok" ? `これ、知らないと損かも` : `最近これ使ってる`;
-      copy.sub = `${name}の${point}を投稿風に自然に伝える`;
-      copy.sns = `最近使ってよかったもの。`;
-    }
-
-    if (copyTone === "BtoB") {
-      copy.main = `${name}で業務改善を加速`;
-      copy.sub = `${point}をわかりやすく伝え、問い合わせや資料請求につなげる`;
-    }
-
-    if (resolvedPlatform === "Instagram") {
-      copy.sub = `${point}を、世界観と一緒にわかりやすく伝える`;
-      copy.sns = `この雰囲気、好きな人多そう。`;
-    }
-
-    if (resolvedPlatform === "Facebook") {
-      copy.sub = `${point}と信頼感を整理し、比較検討しやすく伝える`;
-      copy.trust = `${industryRule.trustHint}。検討前の不安を減らします`;
-    }
-
-    if (resolvedPlatform === "TikTok") {
-      copy.main = copyTone === "高級" ? copy.main : fitCopyLength(copy.sns || copy.main, platformRule.mainMax);
-      copy.sub = `${name}の${point}を、会話風にテンポよく伝える`;
-      copy.short = `まず見てみて`;
-    }
-
-    if (resolvedPlatform === "Google広告") {
-      copy.main = `${point}なら${name}`;
-      copy.sub = `悩みや比較検討に合わせて、メリットを直球で伝える`;
-    }
-
-    const sanitized = (Object.keys(copy) as Array<keyof CopyBundle>).reduce((next, key) => {
-      const max = key === "main" ? platformRule.mainMax : key === "sub" ? platformRule.subMax : 80;
-      next[key] = fitCopyLength(sanitizeAdCopy(copy[key], industryRule.avoidWords), max);
+    const sanitized = (Object.keys(rawCopy) as Array<keyof CopyBundle>).reduce((next, key) => {
+      const max = key === "main" ? instagramRule.mainMax : key === "sub" ? instagramRule.subMax : 80;
+      next[key] = fitCopyLength(sanitizeAdCopy(rawCopy[key], industryRule.avoidWords), max);
       return next;
     }, {} as CopyBundle);
 
@@ -962,7 +964,7 @@ export default function Home() {
 
     setMainCopy(unique.main);
     setSubCopy(unique.sub);
-    setCtaCopy(defaultCta);
+    setCtaCopy(campaignCta);
     setBenefitCopy(unique.benefit);
     setProblemCopy(unique.problem);
     setTrustCopy(unique.trust);
@@ -970,7 +972,7 @@ export default function Home() {
     setShortCopy(unique.short);
     setSnsCopy(unique.sns);
     setComparisonCopy(unique.comparison);
-    setDescriptionCopy(`${unique.description} 業界は「${resolvedIndustry}」、媒体は「${platformRule.label}」として最適化しています。`);
+    setDescriptionCopy(unique.description);
     setHasEditedCopy(false);
   };
 
@@ -991,7 +993,6 @@ export default function Home() {
       setCampaignType(data.campaignType || "商品販売");
       setAdType(data.adType || "CV重視");
       setIndustry(data.industry || "自動判定");
-      setPlatform(data.platform || "自動最適化");
       setLanguage(data.language || "日本語");
       setSize(data.size || "1080×1080");
       setDesignCount(data.designCount || "3枚");
@@ -1024,7 +1025,7 @@ export default function Home() {
       generateCopies();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [product, target, appeal, copyTone, campaignType, adType, industry, platform, size]);
+  }, [product, target, appeal, copyTone, campaignType, adType, industry, size]);
 
   useEffect(() => {
     setSelectedDesignTitles((current) => current.slice(0, selectedDesignCount));
@@ -1257,12 +1258,12 @@ export default function Home() {
 広告ジャンル: ${campaignType}
 広告タイプ: ${adType}
 業界: ${resolvedIndustry}（選択: ${industry}）
-媒体: ${platformRule.label}（選択: ${platform}）
+媒体: Instagram
 商品・サービス: ${product || "未入力"}
 ターゲット: ${target || "未入力"}
 主な訴求: ${appeal || "未入力"}
 目的: ${campaignFocus.main}
-媒体別方針: ${platformRule.direction}
+媒体別方針: ${instagramRule.direction}
 
 【サイズ】
 各バナー: ${size}
@@ -1305,9 +1306,8 @@ ${finalCanvasSize} 相当の1枚のキャンバスに、${size} 相当の独立�
     campaignCta,
     adType,
     industry,
-    platform,
     resolvedIndustry,
-    platformRule,
+    instagramRule.direction,
     product,
     target,
     appeal,
@@ -1334,7 +1334,6 @@ ${finalCanvasSize} 相当の1枚のキャンバスに、${size} 相当の独立�
       campaignType,
       adType,
       industry,
-      platform,
       language,
       size,
       designCount,
@@ -1391,7 +1390,6 @@ ${finalCanvasSize} 相当の1枚のキャンバスに、${size} 相当の独立�
     setCampaignType("商品販売");
     setAdType("CV重視");
     setIndustry("自動判定");
-    setPlatform("自動最適化");
     setLanguage("日本語");
     setSize("1080×1080");
     setDesignCount("3枚");
@@ -1494,7 +1492,6 @@ ${finalCanvasSize} 相当の1枚のキャンバスに、${size} 相当の独立�
                 <Select label="広告ジャンル" value={campaignType} onChange={(v) => setCampaignType(v as CampaignType)} options={CAMPAIGN_TYPES} />
                 <Select label="広告タイプ" value={adType} onChange={(v) => setAdType(v as AdType)} options={["CV重視", "CTR重視", "高級ブランド", "UGC風", "セール訴求", "BtoB"]} />
                 <Select label="業界" value={industry} onChange={(v) => setIndustry(v as Industry)} options={INDUSTRIES} />
-                <Select label="媒体" value={platform} onChange={(v) => setPlatform(v as Platform)} options={PLATFORMS} />
                 <Select label="出力言語" value={language} onChange={(v) => setLanguage(v as Language)} options={["日本語", "英語"]} />
                 <Select label="画像サイズ" value={size} onChange={(v) => setSize(v as BannerSize)} options={["1080×1080", "1200×628", "1080×1920"]} />
                 <Select label="デザインパターン数" value={designCount} onChange={(v) => setDesignCount(v as DesignCount)} options={DESIGN_COUNTS} />
@@ -1503,7 +1500,7 @@ ${finalCanvasSize} 相当の1枚のキャンバスに、${size} 相当の独立�
                   <div className="text-xs font-bold text-gray-500">最終出力サイズ</div>
                   <div className="mt-1 text-2xl font-black">{finalCanvasSize}</div>
                   <p className="mt-2 text-xs font-medium opacity-75">
-                    各バナーは {size}、{layoutInstruction}で出力します。業界: {resolvedIndustry} / 媒体: {platformRule.label}
+                    各バナーは {size}、{layoutInstruction}で出力します。業界: {resolvedIndustry} / Instagram向け
                   </p>
                 </div>
               </SidebarSection>
@@ -1548,19 +1545,6 @@ ${finalCanvasSize} 相当の1枚のキャンバスに、${size} 相当の独立�
               selectedDesignCount={selectedDesigns.length}
             />
 
-            <PreviewArea
-              panel={panel}
-              softPanel={softPanel}
-              designs={selectedDesigns}
-              mainCopy={mainCopy}
-              subCopy={subCopy}
-              ctaCopy={ctaCopy}
-              product={product}
-              size={size}
-              finalCanvasSize={finalCanvasSize}
-              layoutInstruction={layoutInstruction}
-              campaignType={campaignType}
-            />
 
             <div className={`rounded-2xl border shadow-sm ${panel}`}>
               <div className={`sticky top-0 z-30 border-b px-4 pt-2 ${darkMode ? "border-zinc-800 bg-zinc-900/95" : "border-gray-200 bg-white/95"} backdrop-blur`}>
@@ -1631,8 +1615,22 @@ ${finalCanvasSize} 相当の1枚のキャンバスに、${size} 相当の独立�
                     <div className={`rounded-xl p-5 ${softPanel}`}>
                       <h2 className="text-xl font-black">バナー文字案</h2>
                       <p className="mt-2 text-sm font-medium leading-7 opacity-80">
-                        広告ジャンルとコピータイプに合わせて、バナーに使う文言を作成します。
+                        ここに出る文言は、画像内に入れるための候補です。メインコピーは一番大きい見出し、サブコピーは補足説明、CTAはボタン風に見せる行動文言として使います。
                       </p>
+                      <div className="mt-4 grid gap-3 text-sm md:grid-cols-3">
+                        <div className="rounded-lg border border-gray-200 bg-white p-3 text-gray-700">
+                          <div className="font-black text-gray-900">メインコピー</div>
+                          <p className="mt-1 leading-6">画像で最も目立たせる一言。第一印象を作ります。</p>
+                        </div>
+                        <div className="rounded-lg border border-gray-200 bg-white p-3 text-gray-700">
+                          <div className="font-black text-gray-900">サブコピー</div>
+                          <p className="mt-1 leading-6">見出しを補足する短い説明。理由や魅力を伝えます。</p>
+                        </div>
+                        <div className="rounded-lg border border-gray-200 bg-white p-3 text-gray-700">
+                          <div className="font-black text-gray-900">CTA</div>
+                          <p className="mt-1 leading-6">クリック・予約・応募など、次の行動を促す文言です。</p>
+                        </div>
+                      </div>
                     </div>
 
                     <div className="grid gap-5 lg:grid-cols-[280px_minmax(0,1fr)]">
@@ -1650,18 +1648,18 @@ ${finalCanvasSize} 相当の1枚のキャンバスに、${size} 相当の独立�
                       </div>
 
                       <div className="grid gap-5 xl:grid-cols-2">
-                        <Input label="メインコピー" value={mainCopy} onChange={(value) => { setMainCopy(value); setHasEditedCopy(true); }} />
-                        <Input label="CTA" value={ctaCopy} onChange={(value) => { setCtaCopy(value); setHasEditedCopy(true); }} />
-                        <Textarea label="サブコピー" value={subCopy} onChange={(value) => { setSubCopy(value); setHasEditedCopy(true); }} />
-                        <Textarea label="ベネフィットコピー" value={benefitCopy} onChange={(value) => { setBenefitCopy(value); setHasEditedCopy(true); }} />
-                        <Textarea label="悩み訴求コピー" value={problemCopy} onChange={(value) => { setProblemCopy(value); setHasEditedCopy(true); }} />
-                        <Textarea label="信頼訴求コピー" value={trustCopy} onChange={(value) => { setTrustCopy(value); setHasEditedCopy(true); }} />
-                        <Textarea label="限定訴求コピー" value={limitedCopy} onChange={(value) => { setLimitedCopy(value); setHasEditedCopy(true); }} />
-                        <Textarea label="短尺コピー" value={shortCopy} onChange={(value) => { setShortCopy(value); setHasEditedCopy(true); }} />
-                        <Textarea label="SNS風コピー" value={snsCopy} onChange={(value) => { setSnsCopy(value); setHasEditedCopy(true); }} />
-                        <Textarea label="比較訴求コピー" value={comparisonCopy} onChange={(value) => { setComparisonCopy(value); setHasEditedCopy(true); }} />
+                        <Input label="メインコピー（画像の主見出し）" value={mainCopy} onChange={(value) => { setMainCopy(value); setHasEditedCopy(true); }} />
+                        <Input label="CTA（ボタン風の行動文言）" value={ctaCopy} onChange={(value) => { setCtaCopy(value); setHasEditedCopy(true); }} />
+                        <Textarea label="サブコピー（主見出しの補足）" value={subCopy} onChange={(value) => { setSubCopy(value); setHasEditedCopy(true); }} />
+                        <Textarea label="ベネフィットコピー（得られる価値）" value={benefitCopy} onChange={(value) => { setBenefitCopy(value); setHasEditedCopy(true); }} />
+                        <Textarea label="悩み訴求コピー（共感の一言）" value={problemCopy} onChange={(value) => { setProblemCopy(value); setHasEditedCopy(true); }} />
+                        <Textarea label="信頼訴求コピー（安心材料）" value={trustCopy} onChange={(value) => { setTrustCopy(value); setHasEditedCopy(true); }} />
+                        <Textarea label="限定訴求コピー（今見る理由）" value={limitedCopy} onChange={(value) => { setLimitedCopy(value); setHasEditedCopy(true); }} />
+                        <Textarea label="短尺コピー（小さな装飾文言）" value={shortCopy} onChange={(value) => { setShortCopy(value); setHasEditedCopy(true); }} />
+                        <Textarea label="SNS風コピー（投稿風の一言）" value={snsCopy} onChange={(value) => { setSnsCopy(value); setHasEditedCopy(true); }} />
+                        <Textarea label="比較訴求コピー（選ぶ理由）" value={comparisonCopy} onChange={(value) => { setComparisonCopy(value); setHasEditedCopy(true); }} />
                         <div className="xl:col-span-2">
-                          <Textarea label="長め説明コピー" value={descriptionCopy} onChange={(value) => { setDescriptionCopy(value); setHasEditedCopy(true); }} />
+                          <Textarea label="長め説明コピー（生成プロンプト用の意図説明）" value={descriptionCopy} onChange={(value) => { setDescriptionCopy(value); setHasEditedCopy(true); }} />
                         </div>
                       </div>
                     </div>
@@ -1837,6 +1835,20 @@ ${finalCanvasSize} 相当の1枚のキャンバスに、${size} 相当の独立�
                 )}
               </div>
             </div>
+
+            <PreviewArea
+              panel={panel}
+              softPanel={softPanel}
+              designs={selectedDesigns}
+              mainCopy={mainCopy}
+              subCopy={subCopy}
+              ctaCopy={ctaCopy}
+              product={product}
+              size={size}
+              finalCanvasSize={finalCanvasSize}
+              layoutInstruction={layoutInstruction}
+              campaignType={campaignType}
+            />
           </section>
         </div>
       </div>

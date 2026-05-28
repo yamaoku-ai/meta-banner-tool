@@ -298,15 +298,15 @@ const sanitizeAdCopy = (value: string, avoidWords: string[]) => {
     治る: "相談できる",
     完治: "相談",
     痩せる: "スタイル管理",
-    直球コピー: "短い案内",
-    信頼訴求: "安心材料",
-    共感訴求: "共感",
-    世界観訴求: "ブランドの魅力",
-    比較訴求: "選ぶ理由",
-    ベネフィット訴求: "得られる価値",
-    権威性訴求: "安心材料",
-    訴求: "案内",
-    構成: "見せ方",
+    直球コピー: "",
+    信頼訴求: "",
+    共感訴求: "",
+    世界観訴求: "",
+    比較訴求: "",
+    ベネフィット訴求: "",
+    権威性訴求: "",
+    訴求: "",
+    構成: "",
   };
 
   return [...avoidWords, ...Object.keys(replacements)].reduce((current, word) => {
@@ -331,10 +331,10 @@ const uniqueCopyBundle = (bundle: CopyBundle, name: string): CopyBundle => {
   const used = new Set<string>();
   const fallback: Partial<Record<keyof CopyBundle, string>> = {
     main: `${name}をチェック`,
-    sub: `${name}の魅力をわかりやすく紹介`,
-    benefit: `選びやすさが伝わる案内`,
+    sub: `${name}の特徴がひと目でわかる`,
+    benefit: `選ぶ前に知りたいポイント`,
     problem: `今の選択に迷っている方へ`,
-    trust: `安心して検討できる情報を紹介`,
+    trust: `${name}を選ぶ前に知りたいポイント`,
     limited: `今だけの情報をチェック`,
     short: `${name}を見る`,
     sns: `これ、ちょっと気になる。`,
@@ -660,12 +660,12 @@ export default function Home() {
       comparison: string;
     }> = {
       美容: {
-        item: "美容アイテム",
+        item: "美容ケア",
         main: "毎日のケアをもっと気軽に",
-        sub: "続けやすさにこだわった美容アイテム",
+        sub: "続けやすさにこだわった美容ケア",
         benefit: "自分に合うケアを見つけやすい",
         problem: "今のケアに物足りなさを感じている方へ",
-        trust: "初めての方にも選ばれている人気アイテム",
+        trust: "初めての方にも選ばれている美容ケア",
         sns: "最近これ使ってる人多い",
         comparison: "使いやすさで選びたい方へ",
       },
@@ -685,7 +685,7 @@ export default function Home() {
         sub: "立地・価格・暮らしやすさをまとめて確認",
         benefit: "納得して住まいを選びやすい",
         problem: "物件選びで迷っている方へ",
-        trust: "相談しやすさと実績が伝わる案内",
+        trust: "相談しやすさと実績がわかる",
         sns: "この部屋、ちょっと見てみたい",
         comparison: "暮らしやすさで比べたい方へ",
       },
@@ -702,7 +702,7 @@ export default function Home() {
       飲食: {
         item: "人気メニュー",
         main: "今日行きたいお店に",
-        sub: "人気メニューとお店の雰囲気を紹介",
+        sub: "人気メニューとお店の雰囲気がわかる",
         benefit: "来店前に食べたい理由が見つかる",
         problem: "今日のお店選びに迷っている方へ",
         trust: "写真でお店の雰囲気がわかる",
@@ -710,7 +710,7 @@ export default function Home() {
         comparison: "雰囲気でお店を選びたい方へ",
       },
       EC: {
-        item: "人気アイテム",
+        item: "商品",
         main: "欲しいが見つかる",
         sub: "価格・レビュー・使いやすさを比較",
         benefit: "買う前に選ぶ理由がわかる",
@@ -732,7 +732,7 @@ export default function Home() {
       医療: {
         item: "相談先",
         main: "まずは気軽に相談を",
-        sub: "不安なことを相談しやすい案内",
+        sub: "不安なことを相談しやすい窓口",
         benefit: "悩みを整理して相談しやすい",
         problem: "不安をそのままにしたくない方へ",
         trust: "丁寧に相談できる環境です",
@@ -752,12 +752,12 @@ export default function Home() {
       その他: {
         item: "サービス",
         main: `${name}をチェック`,
-        sub: "魅力と選ぶ理由を短く紹介",
-        benefit: "短時間で価値が伝わる",
+        sub: "特徴と選ぶ理由がひと目でわかる",
+        benefit: "短時間で特徴が伝わる",
         problem: "何を選ぶか迷っている方へ",
-        trust: "安心して検討できる情報を紹介",
+        trust: "検討前に知りたいポイントを整理",
         sns: "これ、ちょっと気になる",
-        comparison: "比べて選びやすい案内",
+        comparison: "比べて選びやすいポイントを整理",
       },
     };
 
@@ -766,27 +766,41 @@ export default function Home() {
     const campaignCopy: Record<CampaignType, CopyBundle> = {
       商品販売: {
         main: currentIndustry === "美容" ? "理想の自分を目指すなら" : `${name}を選ぶ理由`,
-        sub: currentIndustry === "美容" ? "毎日のケアに取り入れやすい人気アイテム" : `${i.item}の魅力を短く紹介`,
+        sub: currentIndustry === "美容"
+          ? "毎日のケアに取り入れやすい美容ケア"
+          : currentIndustry === "飲食"
+            ? "人気メニューとお店の雰囲気がわかる"
+            : currentIndustry === "人材"
+              ? "仕事内容と働きやすさがわかる"
+              : currentIndustry === "不動産"
+                ? "暮らしやすさと住まいの魅力がわかる"
+                : currentIndustry === "SaaS"
+                  ? "機能と導入メリットをまとめて確認"
+                  : currentIndustry === "医療"
+                    ? "相談前に知りたい内容を確認"
+                    : currentIndustry === "教育"
+                      ? "学び方と続けやすさがわかる"
+                      : `${name}の特徴がひと目でわかる`,
         benefit: currentIndustry === "美容" ? "毎日の習慣に取り入れやすい" : "買う前に魅力がひと目でわかる",
         problem: currentIndustry === "美容" ? "今のケアに物足りなさを感じている方へ" : "どれを選ぶか迷っている方へ",
-        trust: currentIndustry === "美容" ? "初めての方にも選ばれている人気アイテム" : "レビューを見ながら選びやすい",
+        trust: currentIndustry === "美容" ? "初めての方にも選ばれている美容ケア" : "レビューを見ながら選びやすい",
         limited: "今だけの案内をチェック",
         short: `${name}を見る`,
         sns: i.sns,
         comparison: i.comparison,
-        description: `${safeAudience}に向けて、画像内で商品の魅力と選ぶ理由を短く見せます。`,
+        description: `${safeAudience}に向けて、画像に入れる「見出し・補足・ボタン文言」を作ります。`,
       },
       店舗集客: {
         main: currentIndustry === "飲食" ? "今日行きたいお店に" : `気軽に立ち寄れる${name}`,
-        sub: currentIndustry === "飲食" ? "人気メニューとお店の雰囲気を紹介" : "雰囲気と通いやすさが伝わる案内",
+        sub: currentIndustry === "飲食" ? "人気メニューとお店の雰囲気がわかる" : "雰囲気と通いやすさがひと目でわかる",
         benefit: "来店前に魅力がわかる",
         problem: "行き先に迷っている方へ",
-        trust: "写真で雰囲気が伝わる案内",
+        trust: "写真で雰囲気がわかる",
         limited: "今週行きたい場所をチェック",
         short: "お店を見る",
         sns: currentIndustry === "飲食" ? "ここ、次行きたい" : "ここ、保存しておきたい",
         comparison: "雰囲気で選びたい方へ",
-        description: `${safeAudience}に向けて、来店したくなる理由を画像内で短く見せます。`,
+        description: `${safeAudience}に向けて、来店前に魅力が伝わる画像用コピーを作ります。`,
       },
       求人: {
         main: "自分らしく働ける環境へ",
@@ -798,7 +812,7 @@ export default function Home() {
         short: "求人を見る",
         sns: "この職場、ちょっと良さそう",
         comparison: "条件だけでなく働きやすさで選ぶ",
-        description: `${safeAudience}に向けて、働くメリットと応募しやすさを画像内で伝えます。`,
+        description: `${safeAudience}に向けて、応募前に働くイメージが持てる画像用コピーを作ります。`,
       },
       サービス申込: {
         main: `${name}を気軽に始める`,
@@ -810,11 +824,11 @@ export default function Home() {
         short: "申し込む",
         sns: "これなら始めやすそう",
         comparison: "内容を見てから決められる",
-        description: `${safeAudience}に向けて、申込前に知りたい内容を画像内で短く見せます。`,
+        description: `${safeAudience}に向けて、申込前の不安を減らす画像用コピーを作ります。`,
       },
       リード獲得: {
         main: "まずは無料で相談",
-        sub: "相談するメリットがすぐにわかる案内",
+        sub: "相談前の不安を減らせる内容です",
         benefit: "自分に合う選択肢を確認できる",
         problem: "ひとりで判断しにくい方へ",
         trust: "気軽に相談しやすい窓口です",
@@ -822,11 +836,11 @@ export default function Home() {
         short: "相談する",
         sns: "相談だけできるのは助かる",
         comparison: "調べ続けるより、まず相談",
-        description: `${safeAudience}に向けて、無料相談しやすい理由を画像内で見せます。`,
+        description: `${safeAudience}に向けて、相談しやすさが伝わる画像用コピーを作ります。`,
       },
       LINE登録: {
         main: "お得な情報をLINEで",
-        sub: "登録するメリットがすぐにわかる案内",
+        sub: "登録すると受け取れる内容がわかる",
         benefit: "最新情報や特典を受け取りやすい",
         problem: "大事な案内を見逃したくない方へ",
         trust: "登録後に届く内容がわかる",
@@ -834,7 +848,7 @@ export default function Home() {
         short: "LINE登録する",
         sns: "LINEで届くの便利そう",
         comparison: "探すよりLINEで受け取る",
-        description: `${safeAudience}に向けて、LINE登録の手軽さと特典を画像内で伝えます。`,
+        description: `${safeAudience}に向けて、LINE登録のメリットが伝わる画像用コピーを作ります。`,
       },
       資料請求: {
         main: `${name}を資料で確認`,
@@ -846,35 +860,35 @@ export default function Home() {
         short: "資料を見る",
         sns: "資料だけ見られるのは助かる",
         comparison: "資料で比べてから選べる",
-        description: `${safeAudience}に向けて、資料で確認できる内容を画像内で短く見せます。`,
+        description: `${safeAudience}に向けて、資料請求につながる画像用コピーを作ります。`,
       },
       アプリDL: {
         main: `${name}で、もっと手軽に`,
         sub: "スマホでかんたんに使えるアプリ",
         benefit: "毎日の手間を少し減らせる",
         problem: "もっと手軽に済ませたい方へ",
-        trust: "使いやすさが伝わる案内",
+        trust: "使いやすさがひと目でわかる",
         limited: "無料で始められる今のうちに",
         short: "アプリで体験",
         sns: "このアプリ、普通に便利",
         comparison: "面倒な手順よりアプリでかんたんに",
-        description: `${safeAudience}に向けて、アプリの便利さを画像内で短く見せます。`,
+        description: `${safeAudience}に向けて、アプリの便利さが伝わる画像用コピーを作ります。`,
       },
       ブランド認知: {
         main: currentIndustry === "不動産" ? "理想の暮らしを叶える住まい" : `${name}の魅力を知る`,
-        sub: currentIndustry === "不動産" ? "上質な空間設計にこだわりました" : "ブランドの魅力が自然に伝わる案内",
+        sub: currentIndustry === "不動産" ? "上質な空間設計にこだわりました" : "ブランドらしさと魅力がひと目でわかる",
         benefit: "価値観に合うブランドと出会える",
         problem: "自分に合う選択を探している方へ",
-        trust: "売り込みすぎず印象に残る見せ方",
+        trust: "売り込みすぎず印象に残る",
         limited: "今、注目したいブランド体験",
         short: `${name}を知る`,
         sns: "この雰囲気、けっこう好き",
         comparison: "価格だけでなく雰囲気で選ぶ",
-        description: `${safeAudience}に向けて、ブランドの印象と魅力を画像内で見せます。`,
+        description: `${safeAudience}に向けて、ブランドの印象が残る画像用コピーを作ります。`,
       },
       イベント: {
         main: `${name}で特別な体験を`,
-        sub: "参加したくなる理由がすぐにわかる案内",
+        sub: "参加前に楽しみ方がイメージできる",
         benefit: "今しかできない体験を楽しめる",
         problem: "週末の予定を探している方へ",
         trust: "日時・場所・内容がわかりやすい",
@@ -882,19 +896,19 @@ export default function Home() {
         short: "イベントを見る",
         sns: "これ、友だちと行きたい",
         comparison: "見るだけより参加して楽しむ",
-        description: `${safeAudience}に向けて、イベントの楽しさと参加理由を画像内で見せます。`,
+        description: `${safeAudience}に向けて、参加したくなる画像用コピーを作ります。`,
       },
       その他: {
         main: `${name}をチェック`,
-        sub: "魅力と選ぶ理由を短く紹介",
-        benefit: "短時間で価値が伝わる",
+        sub: "特徴と選ぶ理由がひと目でわかる",
+        benefit: "短時間で特徴が伝わる",
         problem: "何を選ぶか迷っている方へ",
-        trust: "安心して検討できる情報を紹介",
+        trust: "検討前に知りたいポイントを整理",
         limited: "気になった今がチェックのタイミング",
         short: `${name}を見る`,
         sns: "これ、ちょっと気になる",
-        comparison: "比べて選びやすい案内",
-        description: `${safeAudience}に向けて、魅力と選ぶ理由を画像内で短く見せます。`,
+        comparison: "比べて選びやすいポイントを整理",
+        description: `${safeAudience}に向けて、特徴と選ぶ理由が伝わる画像用コピーを作ります。`,
       },
     };
 
@@ -902,7 +916,7 @@ export default function Home() {
       CV重視: {
         main: currentCampaignType === "商品販売" ? `${name}を選ぶ理由` : campaignCopy[currentCampaignType].main,
         sub: "迷わず次の行動に進める案内",
-        trust: "初めてでも判断しやすい情報を紹介",
+        trust: "初めてでも選びやすいポイントを整理",
         short: campaignCta,
       },
       CTR重視: {
@@ -913,7 +927,7 @@ export default function Home() {
       },
       高級ブランド: {
         main: currentIndustry === "美容" ? "ワンランク上のケア体験" : `ワンランク上の${name}`,
-        sub: "上質な印象が残るシンプルな案内",
+        sub: "上質な印象が残るシンプルな見せ方",
         benefit: "日常を少し上質にする選択",
         comparison: "価格だけでなく価値で選ぶ",
         sns: "この雰囲気、ちゃんと上品",
@@ -927,7 +941,7 @@ export default function Home() {
       },
       セール訴求: {
         main: currentCampaignType === "求人" ? "今だけ応募受付中" : "今だけ特別価格",
-        sub: "期間限定キャンペーン実施中",
+        sub: "今だけのキャンペーン実施中",
         benefit: "今チェックする理由がわかる",
         limited: "期間限定の案内をチェック",
         short: "今すぐ見る",
@@ -945,7 +959,15 @@ export default function Home() {
     const copyToneCopy: Record<CopyTone, Partial<CopyBundle>> = {
       強め: {
         main: currentCampaignType === "求人" ? "今の働き方を変えるなら" : currentIndustry === "美容" && currentCampaignType === "商品販売" ? "理想の自分を目指すなら" : `${name}を選ぶなら今`,
-        sub: currentIndustry === "美容" && currentCampaignType === "商品販売" ? "毎日のケアに取り入れやすい人気アイテム" : "今チェックしたい理由がすぐにわかる",
+        sub: currentIndustry === "美容" && currentCampaignType === "商品販売"
+          ? "毎日のケアに取り入れやすい美容ケア"
+          : currentCampaignType === "店舗集客"
+            ? "来店前に雰囲気と魅力がわかる"
+            : currentCampaignType === "求人"
+              ? "仕事内容と働きやすさがわかる"
+              : currentCampaignType === "資料請求"
+                ? "導入前の比較ポイントがわかる"
+                : "今チェックしたい理由がすぐにわかる",
       },
       自然: {
         main: i.main,
@@ -965,16 +987,16 @@ export default function Home() {
       },
       実績: {
         main: currentCampaignType === "求人" ? "働きやすさで選ばれる職場" : `選ばれている${name}`,
-        sub: currentIndustry === "美容" ? "多くの方に選ばれている人気アイテム" : "選ばれる理由を短く紹介",
+        sub: currentIndustry === "美容" ? "多くの方に選ばれている美容ケア" : "選ばれている理由がひと目でわかる",
       },
       限定: {
         main: currentCampaignType === "求人" ? "今だけ募集受付中" : "今だけ特別案内",
-        sub: "期間限定のメリットをチェック",
+        sub: "今だけのメリットをチェック",
         limited: "期間限定の案内をチェック",
       },
       お得: {
         main: `${name}を賢く始める`,
-        sub: "お得に試したい方へ向けた案内",
+        sub: "お得に始めたい方にぴったり",
       },
       SNS風: {
         main: currentCampaignType === "店舗集客" ? "ここ、保存しておきたい" : i.sns,
@@ -990,7 +1012,7 @@ export default function Home() {
       ...campaignCopy[currentCampaignType],
       ...adTypeCopy[currentAdType],
       ...copyToneCopy[copyTone],
-      description: `${safeAudience}に向けて、広告タイプ「${currentCampaignType}」、業種「${currentIndustry}」、コピータイプ「${copyTone}」に合わせた画像内コピーです。`,
+      description: `${safeAudience}に向けて、目的と業種に合う画像用コピーを作ります。`,
     };
   };
 

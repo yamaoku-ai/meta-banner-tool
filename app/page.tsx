@@ -1667,7 +1667,12 @@ ${finalCanvasSize} 相当の1枚のキャンバスに、${size} 相当の独立�
 
                     <Card title="クリエイティブ評価" icon={<Eye />} panel={panel}>
                       <div className="mt-6 h-[260px] sm:h-[320px]">
-                        <ResponsiveContainer width="100%" height="100%">
+                        <ResponsiveContainer
+  width="100%"
+  height="100%"
+  minWidth={300}
+  minHeight={300}
+>
                           <RadarChart data={chartData}>
                             <PolarGrid />
                             <PolarAngleAxis dataKey="subject" />

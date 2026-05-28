@@ -260,7 +260,7 @@ const INDUSTRY_RULES: Record<ResolvedIndustry, IndustryRule> = {
   その他: {
     mainHint: "選ぶ理由が伝わる",
     benefitHint: "必要な情報が短時間で伝わる",
-    trustHint: "目的に合わせて訴求を整理",
+    trustHint: "目的に合わせて情報を整理",
     avoidWords: ["必ず", "絶対"],
   },
 };
@@ -298,6 +298,15 @@ const sanitizeAdCopy = (value: string, avoidWords: string[]) => {
     治る: "相談できる",
     完治: "相談",
     痩せる: "スタイル管理",
+    直球コピー: "短い案内",
+    信頼訴求: "安心材料",
+    共感訴求: "共感",
+    世界観訴求: "ブランドの魅力",
+    比較訴求: "選ぶ理由",
+    ベネフィット訴求: "得られる価値",
+    権威性訴求: "安心材料",
+    訴求: "案内",
+    構成: "見せ方",
   };
 
   return [...avoidWords, ...Object.keys(replacements)].reduce((current, word) => {
@@ -323,14 +332,14 @@ const uniqueCopyBundle = (bundle: CopyBundle, name: string): CopyBundle => {
   const fallback: Partial<Record<keyof CopyBundle, string>> = {
     main: `${name}をチェック`,
     sub: `${name}の魅力をわかりやすく紹介`,
-    benefit: `選びやすさが伝わる訴求`,
+    benefit: `選びやすさが伝わる案内`,
     problem: `今の選択に迷っている方へ`,
-    trust: `安心して検討できる情報設計`,
+    trust: `安心して検討できる情報を紹介`,
     limited: `今だけの情報をチェック`,
     short: `${name}を見る`,
     sns: `これ、ちょっと気になる。`,
     comparison: `比べて選びやすい見せ方`,
-    description: `${name}の魅力を、広告目的に合わせて整理したコピーです。`,
+    description: `${name}の魅力を、画像内で短く見せるコピーです。`,
   };
 
   return (Object.keys(bundle) as Array<keyof CopyBundle>).reduce((next, key) => {
@@ -556,7 +565,7 @@ export default function Home() {
     if (campaignType === "求人") {
       return {
         main: "応募したくなる求人広告",
-        points: ["職種・勤務地・給与・未経験歓迎を明確にする", "安心感と働きやすさを訴求", "応募CTAを強くする"],
+        points: ["職種・勤務地・給与・未経験歓迎を明確にする", "安心感と働きやすさを伝える", "応募CTAを強くする"],
       };
     }
 
@@ -625,7 +634,7 @@ export default function Home() {
 
     return {
       main: "目的に合わせた広告",
-      points: ["広告目的を明確にする", "ターゲットに合わせたCTAにする", "訴求を絞る"],
+      points: ["広告目的を明確にする", "ターゲットに合わせたCTAにする", "伝える内容を絞る"],
     };
   }, [campaignType]);
 
@@ -637,313 +646,351 @@ export default function Home() {
     point: string,
     audience: string
   ): CopyBundle => {
-    const safePoint = point.trim() || industryRule.mainHint;
+    const safePoint = point.trim();
     const safeAudience = audience.trim() || "検討中の方";
 
-    const baseByCampaign: Record<CampaignType, CopyBundle> = {
-      商品販売: {
-        main: `${name}を選ぶ理由`,
-        sub: "使いやすさと魅力がひと目で伝わる商品案内",
-        benefit: "購入後のイメージが自然に伝わる",
-        problem: "どれを選ぶか迷っている方へ",
-        trust: "レビュー感と使いやすさを見せる構成",
-        limited: "今だけの案内をチェック",
-        short: `${name}を見る`,
-        sns: "これ、ちょっと気になる。",
-        comparison: "価格だけでなく使いやすさで選ぶ",
-        description: `${safeAudience}に向けて、${name}の魅力と選ぶ理由を短く伝えるコピーです。`,
+    const industryWords: Record<ResolvedIndustry, {
+      item: string;
+      main: string;
+      sub: string;
+      benefit: string;
+      problem: string;
+      trust: string;
+      sns: string;
+      comparison: string;
+    }> = {
+      美容: {
+        item: "美容アイテム",
+        main: "毎日のケアをもっと気軽に",
+        sub: "続けやすさにこだわった美容アイテム",
+        benefit: "自分に合うケアを見つけやすい",
+        problem: "今のケアに物足りなさを感じている方へ",
+        trust: "初めての方にも選ばれている人気アイテム",
+        sns: "最近これ使ってる人多い",
+        comparison: "使いやすさで選びたい方へ",
       },
-      店舗集客: {
-        main: `近くで楽しむ${name}`,
-        sub: "雰囲気と通いやすさが伝わる店舗案内",
-        benefit: "来店前にお店の魅力が伝わる",
-        problem: "行き先に迷っている方へ",
-        trust: "雰囲気・口コミ感・場所のわかりやすさを重視",
-        limited: "今週行きたいお店をチェック",
-        short: "行ってみる",
-        sns: "ここ、保存しておきたい。",
-        comparison: "なんとなく選ぶより雰囲気で選ぶ",
-        description: `${safeAudience}に向けて、来店理由と店舗の魅力を伝えるコピーです。`,
+      SaaS: {
+        item: "業務ツール",
+        main: "業務改善をもっとスムーズに",
+        sub: "導入前に知りたい情報をまとめて確認",
+        benefit: "毎日の作業を見直しやすくなる",
+        problem: "今の運用にムダを感じている方へ",
+        trust: "導入前に確認したいポイントを整理",
+        sns: "こういうツール、探してた",
+        comparison: "資料で比べてから選べる",
       },
-      求人: {
+      不動産: {
+        item: "住まい",
+        main: "理想の暮らしに近づく住まい",
+        sub: "立地・価格・暮らしやすさをまとめて確認",
+        benefit: "納得して住まいを選びやすい",
+        problem: "物件選びで迷っている方へ",
+        trust: "相談しやすさと実績が伝わる案内",
+        sns: "この部屋、ちょっと見てみたい",
+        comparison: "暮らしやすさで比べたい方へ",
+      },
+      教育: {
+        item: "学習サービス",
+        main: "学びを次の一歩へ",
+        sub: "続けやすい学習環境がわかる案内",
+        benefit: "自分のペースで成長を目指せる",
+        problem: "学び直しを始めたい方へ",
+        trust: "カリキュラムと受講環境を確認できる",
+        sns: "これなら続けられそう",
+        comparison: "続けやすさで選びたい方へ",
+      },
+      飲食: {
+        item: "人気メニュー",
+        main: "今日行きたいお店に",
+        sub: "人気メニューとお店の雰囲気を紹介",
+        benefit: "来店前に食べたい理由が見つかる",
+        problem: "今日のお店選びに迷っている方へ",
+        trust: "写真でお店の雰囲気がわかる",
+        sns: "ここ、次行きたい",
+        comparison: "雰囲気でお店を選びたい方へ",
+      },
+      EC: {
+        item: "人気アイテム",
+        main: "欲しいが見つかる",
+        sub: "価格・レビュー・使いやすさを比較",
+        benefit: "買う前に選ぶ理由がわかる",
+        problem: "買う決め手がほしい方へ",
+        trust: "レビューを見ながら選びやすい",
+        sns: "これ、買ってよかった系",
+        comparison: "レビューで比べて選べる",
+      },
+      人材: {
+        item: "仕事",
         main: "自分らしく働ける場所へ",
-        sub: "仕事内容と働きやすさが伝わる求人案内",
+        sub: "仕事内容と職場の雰囲気がわかる求人",
         benefit: "応募前に働くイメージが持てる",
         problem: "今の働き方を見直したい方へ",
-        trust: "仕事内容・待遇・職場の雰囲気を明確に見せる",
-        limited: "募集枠があるうちにチェック",
-        short: "応募を見る",
-        sns: "この職場、ちょっと気になる。",
+        trust: "未経験から始めやすい仕事です",
+        sns: "この職場、ちょっと良さそう",
         comparison: "条件だけでなく働きやすさで選ぶ",
-        description: `${safeAudience}に向けて、働くメリットと応募しやすさを伝える求人コピーです。`,
+      },
+      医療: {
+        item: "相談先",
+        main: "まずは気軽に相談を",
+        sub: "不安なことを相談しやすい案内",
+        benefit: "悩みを整理して相談しやすい",
+        problem: "不安をそのままにしたくない方へ",
+        trust: "丁寧に相談できる環境です",
+        sns: "相談しやすそうで安心",
+        comparison: "安心して相談できる場所を選ぶ",
+      },
+      金融: {
+        item: "相談サービス",
+        main: "将来のお金を見直す",
+        sub: "比較検討に必要な情報をまとめて確認",
+        benefit: "自分に合う選択肢を考えやすい",
+        problem: "お金の判断に迷っている方へ",
+        trust: "専門家に相談しながら考えられる",
+        sns: "一度ちゃんと見直したい",
+        comparison: "条件を比べて納得して選ぶ",
+      },
+      その他: {
+        item: "サービス",
+        main: `${name}をチェック`,
+        sub: "魅力と選ぶ理由を短く紹介",
+        benefit: "短時間で価値が伝わる",
+        problem: "何を選ぶか迷っている方へ",
+        trust: "安心して検討できる情報を紹介",
+        sns: "これ、ちょっと気になる",
+        comparison: "比べて選びやすい案内",
+      },
+    };
+
+    const i = industryWords[currentIndustry] || industryWords["その他"];
+
+    const campaignCopy: Record<CampaignType, CopyBundle> = {
+      商品販売: {
+        main: currentIndustry === "美容" ? "理想の自分を目指すなら" : `${name}を選ぶ理由`,
+        sub: currentIndustry === "美容" ? "毎日のケアに取り入れやすい人気アイテム" : `${i.item}の魅力を短く紹介`,
+        benefit: currentIndustry === "美容" ? "毎日の習慣に取り入れやすい" : "買う前に魅力がひと目でわかる",
+        problem: currentIndustry === "美容" ? "今のケアに物足りなさを感じている方へ" : "どれを選ぶか迷っている方へ",
+        trust: currentIndustry === "美容" ? "初めての方にも選ばれている人気アイテム" : "レビューを見ながら選びやすい",
+        limited: "今だけの案内をチェック",
+        short: `${name}を見る`,
+        sns: i.sns,
+        comparison: i.comparison,
+        description: `${safeAudience}に向けて、画像内で商品の魅力と選ぶ理由を短く見せます。`,
+      },
+      店舗集客: {
+        main: currentIndustry === "飲食" ? "今日行きたいお店に" : `気軽に立ち寄れる${name}`,
+        sub: currentIndustry === "飲食" ? "人気メニューとお店の雰囲気を紹介" : "雰囲気と通いやすさが伝わる案内",
+        benefit: "来店前に魅力がわかる",
+        problem: "行き先に迷っている方へ",
+        trust: "写真で雰囲気が伝わる案内",
+        limited: "今週行きたい場所をチェック",
+        short: "お店を見る",
+        sns: currentIndustry === "飲食" ? "ここ、次行きたい" : "ここ、保存しておきたい",
+        comparison: "雰囲気で選びたい方へ",
+        description: `${safeAudience}に向けて、来店したくなる理由を画像内で短く見せます。`,
+      },
+      求人: {
+        main: "自分らしく働ける環境へ",
+        sub: "仕事内容と職場の雰囲気がわかる求人",
+        benefit: "応募前に働くイメージが持てる",
+        problem: "今の働き方を見直したい方へ",
+        trust: "未経験から始めやすい仕事です",
+        limited: "募集枠があるうちにチェック",
+        short: "求人を見る",
+        sns: "この職場、ちょっと良さそう",
+        comparison: "条件だけでなく働きやすさで選ぶ",
+        description: `${safeAudience}に向けて、働くメリットと応募しやすさを画像内で伝えます。`,
       },
       サービス申込: {
         main: `${name}を気軽に始める`,
-        sub: "はじめてでも内容がわかりやすいサービス案内",
+        sub: "はじめてでも内容がわかる案内",
         benefit: "申込前の不安を減らせる",
         problem: "そろそろ見直したい方へ",
-        trust: "内容・流れ・安心材料を整理して見せる",
+        trust: "利用の流れがわかりやすい",
         limited: "始めやすい今のうちに",
         short: "申し込む",
-        sns: "これなら始めやすそう。",
-        comparison: "迷うより、まず内容を見て決める",
-        description: `${safeAudience}に向けて、申込前に知りたい情報を整理したコピーです。`,
+        sns: "これなら始めやすそう",
+        comparison: "内容を見てから決められる",
+        description: `${safeAudience}に向けて、申込前に知りたい内容を画像内で短く見せます。`,
       },
       リード獲得: {
         main: "まずは無料で相談",
-        sub: "相談するメリットがすぐに伝わる案内",
+        sub: "相談するメリットがすぐにわかる案内",
         benefit: "自分に合う選択肢を確認できる",
         problem: "ひとりで判断しにくい方へ",
-        trust: "専門性と相談しやすさを重視",
+        trust: "気軽に相談しやすい窓口です",
         limited: "無料相談を受付中",
-        short: "無料相談する",
-        sns: "相談だけできるのは助かる。",
-        comparison: "調べ続けるより、まず相談する",
-        description: `${safeAudience}に向けて、問い合わせや無料相談への心理的ハードルを下げるコピーです。`,
+        short: "相談する",
+        sns: "相談だけできるのは助かる",
+        comparison: "調べ続けるより、まず相談",
+        description: `${safeAudience}に向けて、無料相談しやすい理由を画像内で見せます。`,
       },
       LINE登録: {
         main: "お得な情報をLINEで",
-        sub: "登録するメリットがすぐに伝わる案内",
+        sub: "登録するメリットがすぐにわかる案内",
         benefit: "最新情報や特典を受け取りやすい",
         problem: "大事な案内を見逃したくない方へ",
-        trust: "登録後に受け取れる内容を明確に見せる",
+        trust: "登録後に届く内容がわかる",
         limited: "LINE限定情報をチェック",
         short: "LINE登録する",
-        sns: "LINEで届くの便利そう。",
+        sns: "LINEで届くの便利そう",
         comparison: "探すよりLINEで受け取る",
-        description: `${safeAudience}に向けて、LINE登録の手軽さと特典を伝えるコピーです。`,
+        description: `${safeAudience}に向けて、LINE登録の手軽さと特典を画像内で伝えます。`,
       },
       資料請求: {
         main: `${name}を資料で確認`,
         sub: "導入前に知りたい情報をまとめて確認",
         benefit: "比較検討に必要な情報が手に入る",
         problem: "判断材料が足りず迷っている方へ",
-        trust: "特徴・料金・事例を整理して見せる",
+        trust: "特徴・料金・事例を確認できる",
         limited: "無料資料を今すぐチェック",
-        short: "無料資料を見る",
-        sns: "資料だけ見られるのは助かる。",
-        comparison: "感覚ではなく資料で比較する",
-        description: `${safeAudience}に向けて、資料請求で得られる情報と比較しやすさを伝えるコピーです。`,
+        short: "資料を見る",
+        sns: "資料だけ見られるのは助かる",
+        comparison: "資料で比べてから選べる",
+        description: `${safeAudience}に向けて、資料で確認できる内容を画像内で短く見せます。`,
       },
       アプリDL: {
         main: `${name}で、もっと手軽に`,
-        sub: "スマホでかんたんに使えるアプリ案内",
+        sub: "スマホでかんたんに使えるアプリ",
         benefit: "毎日の手間を少し減らせる",
         problem: "もっと手軽に済ませたい方へ",
-        trust: "使いやすさと便利さを短く見せる",
+        trust: "使いやすさが伝わる案内",
         limited: "無料で始められる今のうちに",
         short: "アプリで体験",
-        sns: "このアプリ、普通に便利。",
+        sns: "このアプリ、普通に便利",
         comparison: "面倒な手順よりアプリでかんたんに",
-        description: `${safeAudience}に向けて、アプリの手軽さと使うメリットを伝えるコピーです。`,
+        description: `${safeAudience}に向けて、アプリの便利さを画像内で短く見せます。`,
       },
       ブランド認知: {
-        main: `${name}の魅力を知る`,
-        sub: "ブランドらしさが自然に伝わるビジュアル訴求",
+        main: currentIndustry === "不動産" ? "理想の暮らしを叶える住まい" : `${name}の魅力を知る`,
+        sub: currentIndustry === "不動産" ? "上質な空間設計にこだわりました" : "ブランドの魅力が自然に伝わる案内",
         benefit: "価値観に合うブランドと出会える",
         problem: "自分に合う選択を探している方へ",
-        trust: "売り込みすぎず印象に残す構成",
+        trust: "売り込みすぎず印象に残る見せ方",
         limited: "今、注目したいブランド体験",
         short: `${name}を知る`,
-        sns: "この雰囲気、けっこう好き。",
+        sns: "この雰囲気、けっこう好き",
         comparison: "価格だけでなく雰囲気で選ぶ",
-        description: `${safeAudience}に向けて、ブランドの魅力と印象を伝えるコピーです。`,
+        description: `${safeAudience}に向けて、ブランドの印象と魅力を画像内で見せます。`,
       },
       イベント: {
         main: `${name}で特別な体験を`,
-        sub: "参加したくなる理由が伝わるイベント案内",
+        sub: "参加したくなる理由がすぐにわかる案内",
         benefit: "今しかできない体験を楽しめる",
         problem: "週末の予定を探している方へ",
-        trust: "日時・場所・参加メリットを明確に見せる",
-        limited: "席数・期間限定のイベントをチェック",
+        trust: "日時・場所・内容がわかりやすい",
+        limited: "期間限定イベント開催中",
         short: "イベントを見る",
-        sns: "これ、友だちと行きたい。",
+        sns: "これ、友だちと行きたい",
         comparison: "見るだけより参加して楽しむ",
-        description: `${safeAudience}に向けて、イベントの楽しさと参加メリットを伝えるコピーです。`,
+        description: `${safeAudience}に向けて、イベントの楽しさと参加理由を画像内で見せます。`,
       },
       その他: {
         main: `${name}をチェック`,
-        sub: "魅力と選ぶ理由が短く伝わる案内",
+        sub: "魅力と選ぶ理由を短く紹介",
         benefit: "短時間で価値が伝わる",
         problem: "何を選ぶか迷っている方へ",
-        trust: "目的に合わせて情報を整理する",
+        trust: "安心して検討できる情報を紹介",
         limited: "気になった今がチェックのタイミング",
         short: `${name}を見る`,
-        sns: "これ、ちょっと気になる。",
-        comparison: "比べて選びやすい見せ方",
-        description: `${safeAudience}に向けて、${name}の魅力を短く整理したコピーです。`,
-      },
-    };
-
-    const industryCopy: Partial<Record<ResolvedIndustry, Partial<CopyBundle>>> = {
-      美容: {
-        main: currentCampaignType === "店舗集客" ? "通いやすい美容サロン" : "毎日のケアをもっと気軽に",
-        sub: "続けやすさにこだわった美容アイテム",
-        benefit: "自分に合うケアを見つけやすい",
-        problem: "今のケアに物足りなさを感じている方へ",
-        trust: "清潔感と口コミ感が伝わる見せ方",
-        sns: "このケア、続けやすそう。",
-      },
-      SaaS: {
-        main: currentCampaignType === "資料請求" ? `${name}を資料で比較` : "業務改善をもっとスムーズに",
-        sub: "導入前に知りたい情報をまとめて確認",
-        benefit: "現場の手間を減らし、運用を整えやすい",
-        problem: "今の運用にムダを感じている方へ",
-        trust: "導入実績とセキュリティを重視した訴求",
-        sns: "こういうツール、探してた。",
-      },
-      不動産: {
-        main: "理想の暮らしに近づく住まい",
-        sub: "立地・価格・暮らしやすさをまとめて確認",
-        benefit: "納得して住まいを選びやすい",
-        problem: "物件選びで迷っている方へ",
-        trust: "相談しやすさと実績が伝わる見せ方",
-        sns: "この部屋、ちょっと見てみたい。",
-      },
-      教育: {
-        main: "学びを次の一歩へ",
-        sub: "続けやすい学習環境が伝わる案内",
-        benefit: "自分のペースで成長を目指せる",
-        problem: "学び直しを始めたい方へ",
-        trust: "カリキュラムと受講サポートを明確に見せる",
-        sns: "これなら続けられそう。",
-      },
-      飲食: {
-        main: currentCampaignType === "店舗集客" ? `今日行きたい${name}` : "できたてのおいしさを楽しむ",
-        sub: "人気メニューとお店の雰囲気が伝わる案内",
-        benefit: "来店前に食べたい理由が伝わる",
-        problem: "今日のお店選びに迷っている方へ",
-        trust: "メニュー写真と口コミ感を重視した見せ方",
-        sns: "ここ、次行きたい。",
-      },
-      EC: {
-        main: "欲しいが見つかる",
-        sub: "価格・レビュー・使いやすさを見比べやすい案内",
-        benefit: "買う前に選ぶ理由がわかる",
-        problem: "買う決め手がほしい方へ",
-        trust: "レビュー感と配送情報が伝わる見せ方",
-        sns: "これ、買ってよかった系。",
-      },
-      人材: {
-        main: "自分らしく働ける場所へ",
-        sub: "仕事内容と職場の雰囲気が伝わる求人案内",
-        benefit: "応募前に働くイメージが持てる",
-        problem: "今の働き方を見直したい方へ",
-        trust: "待遇・仕事内容・職場環境を明確に見せる",
-        sns: "この職場、ちょっと良さそう。",
-      },
-      医療: {
-        main: "まずは気軽に相談を",
-        sub: "不安なことを相談しやすい案内",
-        benefit: "悩みを整理して相談しやすい",
-        problem: "不安をそのままにしたくない方へ",
-        trust: "丁寧さと専門性が伝わる見せ方",
-        sns: "相談しやすそうで安心。",
-      },
-      金融: {
-        main: "将来のお金を見直す",
-        sub: "比較検討に必要な情報を整理して確認",
-        benefit: "自分に合う選択肢を考えやすい",
-        problem: "お金の判断に迷っている方へ",
-        trust: "リスク説明と専門性が伝わる見せ方",
-        sns: "一度ちゃんと見直したい。",
+        sns: "これ、ちょっと気になる",
+        comparison: "比べて選びやすい案内",
+        description: `${safeAudience}に向けて、魅力と選ぶ理由を画像内で短く見せます。`,
       },
     };
 
     const adTypeCopy: Record<AdType, Partial<CopyBundle>> = {
       CV重視: {
-        main: currentCampaignType === "商品販売" ? `${name}を選ぶ理由` : baseByCampaign[currentCampaignType].main,
-        sub: "迷わず次の行動に進めるシンプルな案内",
+        main: currentCampaignType === "商品販売" ? `${name}を選ぶ理由` : campaignCopy[currentCampaignType].main,
+        sub: "迷わず次の行動に進める案内",
+        trust: "初めてでも判断しやすい情報を紹介",
         short: campaignCta,
-        trust: "不安を減らし、行動しやすくする構成",
       },
       CTR重視: {
         main: currentIndustry === "飲食" ? "今日ここ行かない？" : "これ、気になりませんか？",
         sub: "思わず続きを見たくなる短い見出し",
         short: "まずは見る",
-        sns: "気になって保存したくなる。",
+        sns: "気になって保存したくなる",
       },
       高級ブランド: {
-        main: `ワンランク上の${name}`,
-        sub: "上質感と余白で魅力を印象づける案内",
+        main: currentIndustry === "美容" ? "ワンランク上のケア体験" : `ワンランク上の${name}`,
+        sub: "上質な印象が残るシンプルな案内",
         benefit: "日常を少し上質にする選択",
         comparison: "価格だけでなく価値で選ぶ",
-        sns: "この雰囲気、ちゃんと上品。",
+        sns: "この雰囲気、ちゃんと上品",
       },
       UGC風: {
-        main: currentCampaignType === "求人" ? "この職場、ちょっと気になる" : "最近これ使ってる",
-        sub: "投稿のように自然に見える一言訴求",
-        problem: "もっと早く知りたかったと思える選択",
-        sns: currentCampaignType === "店舗集客" ? "ここ、保存しておきたい。" : "最近使ってよかったもの。",
-        comparison: "広告っぽさよりリアルな使用感で見せる",
+        main: currentCampaignType === "求人" ? "この職場、ちょっと気になる" : i.sns,
+        sub: "投稿になじむ自然なひとこと",
+        problem: "もっと早く知りたかった方へ",
+        sns: currentCampaignType === "店舗集客" ? "ここ、保存しておきたい" : i.sns,
+        comparison: "リアルな使用感で選びやすい",
       },
       セール訴求: {
-        main: currentCampaignType === "求人" ? "今だけ応募受付中" : "今だけ特別案内",
-        sub: "限定感とメリットがすぐに伝わる案内",
-        benefit: "今チェックする理由が伝わる",
+        main: currentCampaignType === "求人" ? "今だけ応募受付中" : "今だけ特別価格",
+        sub: "期間限定キャンペーン実施中",
+        benefit: "今チェックする理由がわかる",
         limited: "期間限定の案内をチェック",
-        short: "今すぐチェック",
+        short: "今すぐ見る",
       },
       BtoB: {
         main: currentCampaignType === "資料請求" ? `${name}を資料で比較` : `${name}で業務を見直す`,
-        sub: "導入前に知りたい情報を整理して確認",
+        sub: "導入前に確認したい内容を整理",
         benefit: "検討に必要な情報をまとめて確認できる",
         problem: "属人的な運用を見直したい方へ",
-        trust: "法人導入に必要な信頼感を重視",
+        trust: "法人導入前に確認しやすい資料です",
         comparison: "感覚ではなく資料で比較する",
       },
     };
 
     const copyToneCopy: Record<CopyTone, Partial<CopyBundle>> = {
       強め: {
-        main: currentCampaignType === "求人" ? "今の働き方を変えるなら" : `${name}を選ぶなら今`,
-        sub: "見た瞬間に魅力が伝わる直球コピー",
+        main: currentCampaignType === "求人" ? "今の働き方を変えるなら" : currentIndustry === "美容" && currentCampaignType === "商品販売" ? "理想の自分を目指すなら" : `${name}を選ぶなら今`,
+        sub: currentIndustry === "美容" && currentCampaignType === "商品販売" ? "毎日のケアに取り入れやすい人気アイテム" : "今チェックしたい理由がすぐにわかる",
       },
       自然: {
-        main: currentIndustry === "美容" ? "毎日のケアをもっと気軽に" : `${name}をもっと身近に`,
-        sub: "Instagramになじむ自然な見せ方",
+        main: i.main,
+        sub: i.sub,
       },
       高級: {
-        main: `ワンランク上の${name}`,
-        sub: "上質感と余白で魅力を伝える案内",
+        main: currentIndustry === "美容" ? "ワンランク上のケア体験" : `ワンランク上の${name}`,
+        sub: currentIndustry === "美容" ? "上質な使い心地にこだわりました" : "上質な印象が残るシンプルな案内",
       },
       共感: {
         main: currentCampaignType === "求人" ? "今の働き方、見直しませんか？" : "その悩み、そろそろ手放しませんか？",
-        sub: `${safeAudience}の気持ちに寄り添う案内`,
+        sub: `${safeAudience}に寄り添うやさしい案内`,
       },
       悩み解決: {
         main: "その悩みに、次の選択を",
-        sub: "今の困りごとを整理して考えやすくする案内",
+        sub: safePoint ? `${safePoint}で迷っている方へ` : i.problem,
       },
       実績: {
-        main: `選ばれている${name}`,
-        sub: "信頼感と選ばれる理由が伝わる案内",
+        main: currentCampaignType === "求人" ? "働きやすさで選ばれる職場" : `選ばれている${name}`,
+        sub: currentIndustry === "美容" ? "多くの方に選ばれている人気アイテム" : "選ばれる理由を短く紹介",
       },
       限定: {
         main: currentCampaignType === "求人" ? "今だけ募集受付中" : "今だけ特別案内",
-        sub: "期間限定のメリットが伝わる案内",
+        sub: "期間限定のメリットをチェック",
         limited: "期間限定の案内をチェック",
       },
       お得: {
         main: `${name}を賢く始める`,
-        sub: "お得に始めたい方へ向けた案内",
+        sub: "お得に試したい方へ向けた案内",
       },
       SNS風: {
-        main: currentCampaignType === "店舗集客" ? "ここ、保存しておきたい" : baseByCampaign[currentCampaignType].sns,
-        sub: "投稿になじむリアルな一言コピー",
+        main: currentCampaignType === "店舗集客" ? "ここ、保存しておきたい" : i.sns,
+        sub: "Instagramになじむ自然なひとこと",
       },
       BtoB: {
         main: currentCampaignType === "資料請求" ? `${name}を資料で比較` : `${name}で業務を見直す`,
-        sub: "導入検討に必要な情報が伝わる案内",
+        sub: "導入前に確認したい内容を整理",
       },
     };
 
     return {
-      ...baseByCampaign[currentCampaignType],
-      ...(industryCopy[currentIndustry] || {}),
+      ...campaignCopy[currentCampaignType],
       ...adTypeCopy[currentAdType],
       ...copyToneCopy[copyTone],
-      description: `${baseByCampaign[currentCampaignType].description} 主な訴求は「${safePoint}」。業界は「${currentIndustry}」、コピータイプは「${copyTone}」、広告タイプは「${currentAdType}」です。`,
+      description: `${safeAudience}に向けて、広告タイプ「${currentCampaignType}」、業種「${currentIndustry}」、コピータイプ「${copyTone}」に合わせた画像内コピーです。`,
     };
   };
 
@@ -1170,7 +1217,7 @@ export default function Home() {
 
     if (!product.trim()) tips.push("商品名を具体的にすると、広告の説得力が上がります。");
     if (!target.trim()) tips.push("ターゲット像を具体化すると、クリック率改善につながります。");
-    if (!appeal.trim()) tips.push("訴求を入力すると、広告で一番目立たせるべきメッセージが明確になります。");
+    if (!appeal.trim()) tips.push("主な強みを入力すると、広告で一番目立たせるべきメッセージが明確になります。");
     if (!mainCopy.trim()) tips.push("メインコピーを入力すると、バナーの第一印象が強くなります。");
     if (!ctaCopy.trim()) tips.push("CTAを入力すると、クリック行動を促しやすくなります。");
     tips.push(`文字数スコアは${copyLengthScore}点です。メイン12〜20文字、サブ20〜35文字、CTA4〜10文字を目安にしてください。`);
@@ -1261,7 +1308,7 @@ export default function Home() {
 媒体: Instagram
 商品・サービス: ${product || "未入力"}
 ターゲット: ${target || "未入力"}
-主な訴求: ${appeal || "未入力"}
+主な強み: ${appeal || "未入力"}
 目的: ${campaignFocus.main}
 媒体別方針: ${instagramRule.direction}
 
@@ -1277,8 +1324,8 @@ CTA: ${ctaCopy || campaignCta}
 
 【補助コピー】
 ベネフィット: ${benefitCopy || "未入力"}
-悩み訴求: ${problemCopy || "未入力"}
-信頼訴求: ${trustCopy || "未入力"}
+悩み・共感: ${problemCopy || "未入力"}
+安心材料: ${trustCopy || "未入力"}
 
 【デザイン案】
 ${designInstructions}
@@ -1485,45 +1532,63 @@ ${finalCanvasSize} 相当の1枚のキャンバスに、${size} 相当の独立�
           </div>
         </header>
 
-        <div className="grid gap-5 xl:grid-cols-[390px_minmax(0,1fr)]">
-          <aside className={`rounded-2xl border p-5 shadow-sm ${panel}`}>
-            <div className="space-y-6">
-              <SidebarSection title="広告設定" icon={<ClipboardList size={18} />}>
-                <Select label="広告ジャンル" value={campaignType} onChange={(v) => setCampaignType(v as CampaignType)} options={CAMPAIGN_TYPES} />
-                <Select label="広告タイプ" value={adType} onChange={(v) => setAdType(v as AdType)} options={["CV重視", "CTR重視", "高級ブランド", "UGC風", "セール訴求", "BtoB"]} />
-                <Select label="業界" value={industry} onChange={(v) => setIndustry(v as Industry)} options={INDUSTRIES} />
-                <Select label="出力言語" value={language} onChange={(v) => setLanguage(v as Language)} options={["日本語", "英語"]} />
-                <Select label="画像サイズ" value={size} onChange={(v) => setSize(v as BannerSize)} options={["1080×1080", "1200×628", "1080×1920"]} />
-                <Select label="デザインパターン数" value={designCount} onChange={(v) => setDesignCount(v as DesignCount)} options={DESIGN_COUNTS} />
-
-                <div className={`rounded-xl border border-gray-200 p-4 ${softPanel}`}>
-                  <div className="text-xs font-bold text-gray-500">最終出力サイズ</div>
-                  <div className="mt-1 text-2xl font-black">{finalCanvasSize}</div>
-                  <p className="mt-2 text-xs font-medium opacity-75">
-                    各バナーは {size}、{layoutInstruction}で出力します。業界: {resolvedIndustry} / Instagram向け
+        <div className="space-y-5">
+          <aside className={`rounded-2xl border p-4 shadow-sm sm:p-5 ${panel}`}>
+            <div className="space-y-4">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <div className="text-blue-600"><ClipboardList size={18} /></div>
+                    <h2 className="text-base font-black">広告設定</h2>
+                  </div>
+                  <p className="mt-1 text-xs font-medium text-gray-500">
+                    よく使う項目だけを上にまとめました。詳細は必要な時だけ開けます。
                   </p>
                 </div>
-              </SidebarSection>
 
-              <SidebarSection title="商品情報" icon={<Target size={18} />}>
+                <div className={`rounded-xl border border-gray-200 px-4 py-3 text-sm ${softPanel}`}>
+                  <div className="font-black">{finalCanvasSize}</div>
+                  <div className="mt-1 text-xs font-medium opacity-75">
+                    {size} / {layoutInstruction} / {resolvedIndustry} / Instagram向け
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid gap-4 lg:grid-cols-2 2xl:grid-cols-4">
                 <Input label="商品・サービス名" value={product} onChange={setProduct} placeholder="例：AI英会話アプリ / カフェスタッフ募集" />
+                <Select label="広告ジャンル" value={campaignType} onChange={(v) => setCampaignType(v as CampaignType)} options={CAMPAIGN_TYPES} />
+                <Select label="業界" value={industry} onChange={(v) => setIndustry(v as Industry)} options={INDUSTRIES} />
+                <Select label="広告タイプ" value={adType} onChange={(v) => setAdType(v as AdType)} options={["CV重視", "CTR重視", "高級ブランド", "UGC風", "セール訴求", "BtoB"]} />
+              </div>
+
+              <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
                 <Input label="ターゲット" value={target} onChange={setTarget} placeholder="例：20代女性 / 渋谷周辺の求職者" />
-                <Textarea label="主な訴求" value={appeal} onChange={setAppeal} placeholder="例：1日5分、初月無料、未経験歓迎、駅近" />
-              </SidebarSection>
+                <Textarea label="主な強み" value={appeal} onChange={setAppeal} placeholder="例：1日5分、初月無料、未経験歓迎、駅近" rows={3} />
+              </div>
 
-              <SidebarSection title="デザイン条件" icon={<Palette size={18} />}>
-                <Input label="デザインテイスト" value={style} onChange={setStyle} placeholder="未入力なら自動で最適化" />
-                <Input label="カラー" value={color} onChange={setColor} placeholder="未入力なら自動で最適化" />
-                <Textarea label="追加メモ" value={memo} onChange={setMemo} placeholder="例：広告感を弱めたい" />
-              </SidebarSection>
+              <details className={`rounded-xl border border-gray-200 ${softPanel}`}>
+                <summary className="cursor-pointer select-none px-4 py-3 text-sm font-black">
+                  詳細設定を開く
+                </summary>
+                <div className="grid gap-4 border-t border-gray-200 p-4 md:grid-cols-2 xl:grid-cols-4">
+                  <Select label="出力言語" value={language} onChange={(v) => setLanguage(v as Language)} options={["日本語", "英語"]} />
+                  <Select label="画像サイズ" value={size} onChange={(v) => setSize(v as BannerSize)} options={["1080×1080", "1200×628", "1080×1920"]} />
+                  <Select label="デザインパターン数" value={designCount} onChange={(v) => setDesignCount(v as DesignCount)} options={DESIGN_COUNTS} />
+                  <Input label="カラー" value={color} onChange={setColor} placeholder="未入力なら自動で最適化" />
+                  <Input label="デザインテイスト" value={style} onChange={setStyle} placeholder="未入力なら自動で最適化" />
+                  <div className="md:col-span-2 xl:col-span-3">
+                    <Textarea label="追加メモ" value={memo} onChange={setMemo} placeholder="例：広告感を弱めたい" rows={3} />
+                  </div>
+                </div>
+              </details>
 
-              <div className="grid grid-cols-2 gap-3">
-                <button onClick={saveForm} className="flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-3 text-sm font-bold text-white hover:bg-blue-700">
+              <div className="sticky bottom-3 z-20 grid grid-cols-2 gap-3 rounded-2xl border border-gray-200 bg-white/95 p-3 shadow-lg backdrop-blur sm:static sm:flex sm:justify-end sm:border-0 sm:bg-transparent sm:p-0 sm:shadow-none">
+                <button onClick={saveForm} className="flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-3 text-sm font-bold text-white hover:bg-blue-700 sm:min-w-32">
                   <Save size={17} />
                   保存
                 </button>
 
-                <button onClick={resetForm} className="flex items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm font-bold text-gray-800 hover:bg-gray-50">
+                <button onClick={resetForm} className="flex items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm font-bold text-gray-800 hover:bg-gray-50 sm:min-w-32">
                   <RotateCcw size={17} />
                   リセット
                 </button>
@@ -1652,12 +1717,12 @@ ${finalCanvasSize} 相当の1枚のキャンバスに、${size} 相当の独立�
                         <Input label="CTA（ボタン風の行動文言）" value={ctaCopy} onChange={(value) => { setCtaCopy(value); setHasEditedCopy(true); }} />
                         <Textarea label="サブコピー（主見出しの補足）" value={subCopy} onChange={(value) => { setSubCopy(value); setHasEditedCopy(true); }} />
                         <Textarea label="ベネフィットコピー（得られる価値）" value={benefitCopy} onChange={(value) => { setBenefitCopy(value); setHasEditedCopy(true); }} />
-                        <Textarea label="悩み訴求コピー（共感の一言）" value={problemCopy} onChange={(value) => { setProblemCopy(value); setHasEditedCopy(true); }} />
-                        <Textarea label="信頼訴求コピー（安心材料）" value={trustCopy} onChange={(value) => { setTrustCopy(value); setHasEditedCopy(true); }} />
-                        <Textarea label="限定訴求コピー（今見る理由）" value={limitedCopy} onChange={(value) => { setLimitedCopy(value); setHasEditedCopy(true); }} />
+                        <Textarea label="悩み・共感コピー（画像内の一言）" value={problemCopy} onChange={(value) => { setProblemCopy(value); setHasEditedCopy(true); }} />
+                        <Textarea label="安心材料コピー（画像内の補足）" value={trustCopy} onChange={(value) => { setTrustCopy(value); setHasEditedCopy(true); }} />
+                        <Textarea label="限定コピー（今見る理由）" value={limitedCopy} onChange={(value) => { setLimitedCopy(value); setHasEditedCopy(true); }} />
                         <Textarea label="短尺コピー（小さな装飾文言）" value={shortCopy} onChange={(value) => { setShortCopy(value); setHasEditedCopy(true); }} />
                         <Textarea label="SNS風コピー（投稿風の一言）" value={snsCopy} onChange={(value) => { setSnsCopy(value); setHasEditedCopy(true); }} />
-                        <Textarea label="比較訴求コピー（選ぶ理由）" value={comparisonCopy} onChange={(value) => { setComparisonCopy(value); setHasEditedCopy(true); }} />
+                        <Textarea label="比較コピー（選ぶ理由）" value={comparisonCopy} onChange={(value) => { setComparisonCopy(value); setHasEditedCopy(true); }} />
                         <div className="xl:col-span-2">
                           <Textarea label="長め説明コピー（生成プロンプト用の意図説明）" value={descriptionCopy} onChange={(value) => { setDescriptionCopy(value); setHasEditedCopy(true); }} />
                         </div>
@@ -1799,7 +1864,7 @@ ${finalCanvasSize} 相当の1枚のキャンバスに、${size} 相当の独立�
                                 <th className="px-4 py-3">商品</th>
                                 <th className="px-4 py-3">ジャンル</th>
                                 <th className="px-4 py-3">ターゲット</th>
-                                <th className="px-4 py-3">訴求</th>
+                                <th className="px-4 py-3">強み</th>
                                 <th className="px-4 py-3">保存日時</th>
                                 <th className="px-4 py-3 text-right">操作</th>
                               </tr>
@@ -2136,17 +2201,19 @@ function Textarea({
   value,
   onChange,
   placeholder,
+  rows = 4,
 }: {
   label: string;
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
+  rows?: number;
 }) {
   return (
     <label className="block">
       <span className="text-sm font-bold">{label}</span>
       <textarea
-        rows={4}
+        rows={rows}
         value={value}
         placeholder={placeholder}
         onChange={(event) => onChange(event.target.value)}

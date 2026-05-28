@@ -13,7 +13,6 @@ import {
   Lightbulb,
   MessageSquareText,
   Moon,
-  Palette,
   RotateCcw,
   Save,
   Sparkles,
@@ -745,7 +744,7 @@ export default function Home() {
         empathyMain: "その作業、もっとラクにしませんか？",
         empathySub: "日々の業務負担を見直したい方へ",
         problemMain: "属人化した運用を見直す",
-        problemSub: "チームで同じ情報を扱いやすく",
+        problemSub: "チームで同じ内容を扱いやすく",
         proofMain: "導入企業が増えている業務ツール",
         proofSub: "現場で使いやすい機能を搭載",
         limitedMain: "無料資料を公開中",
@@ -1099,7 +1098,7 @@ export default function Home() {
         sub: currentIndustry === "飲食" ? "限定メニューや最新案内が届きます" : "登録後のメリットがわかります",
         benefit: "最新の案内や特典を受け取りやすい",
         problem: "大事な案内を見逃したくない方へ",
-        trust: currentIndustry === "求人" ? "募集案内を受け取りやすい" : words.trust,
+        trust: currentCampaignType === "求人" ? "募集案内を受け取りやすい" : words.trust,
         limited: "LINE限定の案内をチェック",
         short: "LINE登録する",
         sns: "LINEで届くの便利そう",
@@ -1236,8 +1235,8 @@ export default function Home() {
         sns: words.sns,
       },
       セール: {
-        main: currentIndustry === "求人" ? "今だけ募集受付中" : currentIndustry === "飲食" ? "期間限定メニュー登場" : "今だけ特別案内",
-        sub: currentIndustry === "求人"
+        main: currentCampaignType === "求人" ? "今だけ募集受付中" : currentIndustry === "飲食" ? "期間限定メニュー登場" : "今だけ特別案内",
+        sub: currentCampaignType === "求人"
           ? "募集枠があるうちにチェック"
           : currentIndustry === "飲食"
             ? "今だけ楽しめるメニューをチェック"
@@ -1565,7 +1564,6 @@ export default function Home() {
     return selected.slice(0, selectedDesignCount);
   }, [recommendedDesigns, selectedDesignTitles, selectedDesignCount]);
 
-  const primaryPreviewDesign = selectedDesigns[0] || ALL_DESIGNS[0];
 
   const chartData = [
     { subject: "停止率", value: analysisScores.scrollStopRate },
@@ -1929,11 +1927,11 @@ ${finalCanvasSize} 相当の1枚のキャンバスに、${size} 相当の独立�
                     <Card title="クリエイティブ評価" icon={<Eye />} panel={panel}>
                       <div className="mt-6 h-[260px] sm:h-[320px]">
                         <ResponsiveContainer
-  width="100%"
-  height="100%"
-  minWidth={300}
-  minHeight={300}
->
+                          width="100%"
+                          height="100%"
+                          minWidth={300}
+                          minHeight={300}
+                        >
                           <RadarChart data={chartData}>
                             <PolarGrid />
                             <PolarAngleAxis dataKey="subject" />

@@ -235,7 +235,7 @@ const INDUSTRY_RULES: Record<ResolvedIndustry, IndustryRule> = {
   },
   EC: {
     mainHint: "欲しいが見つかる",
-    benefitHint: "比較しやすく、買う理由が伝わりやすい",
+    benefitHint: "買う理由が伝わりやすい",
     trustHint: "レビュー・価格・配送・返品しやすさを重視",
     avoidWords: ["最安", "必ず"],
   },
@@ -247,20 +247,20 @@ const INDUSTRY_RULES: Record<ResolvedIndustry, IndustryRule> = {
   },
   医療: {
     mainHint: "まずは気軽に相談を",
-    benefitHint: "不安を整理して相談しやすい",
+    benefitHint: "不安なことを相談しやすい",
     trustHint: "専門性・丁寧さ・安心感を重視",
     avoidWords: ["治る", "完治", "必ず", "絶対", "効果抜群"],
   },
   金融: {
     mainHint: "将来のお金を見直す",
-    benefitHint: "比較検討に必要な情報を整理できる",
+    benefitHint: "自分に合う選択肢を考えやすい",
     trustHint: "リスク説明・実績・専門性を重視",
     avoidWords: ["必ず儲かる", "元本保証", "絶対"],
   },
   その他: {
     mainHint: "選ぶ理由が伝わる",
-    benefitHint: "必要な情報が短時間で伝わる",
-    trustHint: "目的に合わせて情報を整理",
+    benefitHint: "魅力が短時間で伝わる",
+    trustHint: "目的に合わせて魅力を伝える",
     avoidWords: ["必ず", "絶対"],
   },
 };
@@ -332,13 +332,13 @@ const uniqueCopyBundle = (bundle: CopyBundle, name: string): CopyBundle => {
   const fallback: Partial<Record<keyof CopyBundle, string>> = {
     main: `${name}をチェック`,
     sub: `${name}の特徴がひと目でわかる`,
-    benefit: `選ぶ前に知りたいポイント`,
+    benefit: `選ぶ前に魅力がわかる`,
     problem: `今の選択に迷っている方へ`,
-    trust: `${name}を選ぶ前に知りたいポイント`,
-    limited: `今だけの情報をチェック`,
+    trust: `${name}の魅力がひと目でわかる`,
+    limited: `今だけの案内をチェック`,
     short: `${name}を見る`,
     sns: `これ、ちょっと気になる。`,
-    comparison: `比べて選びやすい見せ方`,
+    comparison: `自分に合うか見つけやすい`,
     description: `${name}の魅力を、画像内で短く見せるコピーです。`,
   };
 
@@ -391,7 +391,7 @@ const ALL_DESIGNS: DesignPattern[] = [
     title: "Minimal",
     style: "シンプル・清潔感",
     color: "白・グレー・青",
-    layout: "情報量を絞り、余白と読みやすさを重視。",
+    layout: "文字量を絞り、余白と読みやすさを重視。",
     purpose: "BtoB、SaaS、教育、幅広いサービス向け",
     previewClass: "bg-white text-slate-950",
     accentClass: "bg-blue-600 text-white",
@@ -409,7 +409,7 @@ const ALL_DESIGNS: DesignPattern[] = [
     title: "BtoB",
     style: "信頼感・論理的・実績重視",
     color: "ネイビー・白・ライトブルー",
-    layout: "課題、解決策、実績、CTAを整理。",
+    layout: "課題、解決策、実績、CTAをわかりやすく配置。",
     purpose: "SaaS、資料請求、無料相談、法人向け",
     previewClass: "bg-slate-900 text-white",
     accentClass: "bg-sky-400 text-slate-950",
@@ -445,7 +445,7 @@ const ALL_DESIGNS: DesignPattern[] = [
     title: "Premium Simple",
     style: "上質・簡潔・余白重視",
     color: "白・黒・グレージュ",
-    layout: "情報を絞り、商品価値とコピーを静かに強く見せる。",
+    layout: "文字量を絞り、商品価値とコピーを静かに強く見せる。",
     purpose: "高単価サービス、ブランド訴求、洗練された広告向け",
     previewClass: "bg-neutral-100 text-neutral-950",
     accentClass: "bg-neutral-950 text-white",
@@ -607,7 +607,7 @@ export default function Home() {
     if (campaignType === "資料請求") {
       return {
         main: "資料請求につながる広告",
-        points: ["法人向けの信頼感を重視", "資料で得られる情報を明確にする", "導入事例や実績感を入れる"],
+        points: ["法人向けの信頼感を重視", "資料でわかる内容を明確にする", "導入事例や実績感を入れる"],
       };
     }
 
@@ -672,12 +672,12 @@ export default function Home() {
       SaaS: {
         item: "業務ツール",
         main: "業務改善をもっとスムーズに",
-        sub: "導入前に知りたい情報をまとめて確認",
+        sub: "導入前に全体像がつかめる",
         benefit: "毎日の作業を見直しやすくなる",
         problem: "今の運用にムダを感じている方へ",
-        trust: "導入前に確認したいポイントを整理",
+        trust: "導入前に内容がわかりやすい",
         sns: "こういうツール、探してた",
-        comparison: "資料で比べてから選べる",
+        comparison: "資料を見て納得して選べる",
       },
       不動産: {
         item: "住まい",
@@ -687,7 +687,7 @@ export default function Home() {
         problem: "物件選びで迷っている方へ",
         trust: "相談しやすさと実績がわかる",
         sns: "この部屋、ちょっと見てみたい",
-        comparison: "暮らしやすさで比べたい方へ",
+        comparison: "暮らしやすさで選びたい方へ",
       },
       教育: {
         item: "学習サービス",
@@ -712,12 +712,12 @@ export default function Home() {
       EC: {
         item: "商品",
         main: "欲しいが見つかる",
-        sub: "価格・レビュー・使いやすさを比較",
+        sub: "レビューで選びやすい人気商品",
         benefit: "買う前に選ぶ理由がわかる",
         problem: "買う決め手がほしい方へ",
         trust: "レビューを見ながら選びやすい",
         sns: "これ、買ってよかった系",
-        comparison: "レビューで比べて選べる",
+        comparison: "レビューを見て選べる",
       },
       人材: {
         item: "仕事",
@@ -733,7 +733,7 @@ export default function Home() {
         item: "相談先",
         main: "まずは気軽に相談を",
         sub: "不安なことを相談しやすい窓口",
-        benefit: "悩みを整理して相談しやすい",
+        benefit: "不安なことを相談しやすい",
         problem: "不安をそのままにしたくない方へ",
         trust: "丁寧に相談できる環境です",
         sns: "相談しやすそうで安心",
@@ -742,12 +742,12 @@ export default function Home() {
       金融: {
         item: "相談サービス",
         main: "将来のお金を見直す",
-        sub: "比較検討に必要な情報をまとめて確認",
+        sub: "自分に合うか見つけやすい案内",
         benefit: "自分に合う選択肢を考えやすい",
         problem: "お金の判断に迷っている方へ",
         trust: "専門家に相談しながら考えられる",
         sns: "一度ちゃんと見直したい",
-        comparison: "条件を比べて納得して選ぶ",
+        comparison: "納得して選びたい方へ",
       },
       その他: {
         item: "サービス",
@@ -755,9 +755,9 @@ export default function Home() {
         sub: "特徴と選ぶ理由がひと目でわかる",
         benefit: "短時間で特徴が伝わる",
         problem: "何を選ぶか迷っている方へ",
-        trust: "検討前に知りたいポイントを整理",
+        trust: "選ぶ前に魅力がひと目でわかる",
         sns: "これ、ちょっと気になる",
-        comparison: "比べて選びやすいポイントを整理",
+        comparison: "自分に合うか見つけやすい",
       },
     };
 
@@ -835,31 +835,31 @@ export default function Home() {
         limited: "無料相談を受付中",
         short: "相談する",
         sns: "相談だけできるのは助かる",
-        comparison: "調べ続けるより、まず相談",
+        comparison: "迷ったら、まず相談",
         description: `${safeAudience}に向けて、相談しやすさが伝わる画像用コピーを作ります。`,
       },
       LINE登録: {
-        main: "お得な情報をLINEで",
-        sub: "登録すると受け取れる内容がわかる",
-        benefit: "最新情報や特典を受け取りやすい",
+        main: "お得なお知らせをLINEで",
+        sub: "登録後のメリットがすぐわかる",
+        benefit: "最新のお知らせや特典を受け取りやすい",
         problem: "大事な案内を見逃したくない方へ",
         trust: "登録後に届く内容がわかる",
-        limited: "LINE限定情報をチェック",
+        limited: "LINE限定のお知らせをチェック",
         short: "LINE登録する",
         sns: "LINEで届くの便利そう",
-        comparison: "探すよりLINEで受け取る",
+        comparison: "LINEで手軽に受け取る",
         description: `${safeAudience}に向けて、LINE登録のメリットが伝わる画像用コピーを作ります。`,
       },
       資料請求: {
         main: `${name}を資料で確認`,
-        sub: "導入前に知りたい情報をまとめて確認",
-        benefit: "比較検討に必要な情報が手に入る",
+        sub: "導入前に全体像がつかめる",
+        benefit: "導入後のイメージが持ちやすい",
         problem: "判断材料が足りず迷っている方へ",
-        trust: "特徴・料金・事例を確認できる",
+        trust: "特徴・料金・事例がわかりやすい",
         limited: "無料資料を今すぐチェック",
         short: "資料を見る",
         sns: "資料だけ見られるのは助かる",
-        comparison: "資料で比べてから選べる",
+        comparison: "資料を見て納得して選べる",
         description: `${safeAudience}に向けて、資料請求につながる画像用コピーを作ります。`,
       },
       アプリDL: {
@@ -895,7 +895,7 @@ export default function Home() {
         limited: "期間限定イベント開催中",
         short: "イベントを見る",
         sns: "これ、友だちと行きたい",
-        comparison: "見るだけより参加して楽しむ",
+        comparison: "参加して楽しみたい方へ",
         description: `${safeAudience}に向けて、参加したくなる画像用コピーを作ります。`,
       },
       その他: {
@@ -903,11 +903,11 @@ export default function Home() {
         sub: "特徴と選ぶ理由がひと目でわかる",
         benefit: "短時間で特徴が伝わる",
         problem: "何を選ぶか迷っている方へ",
-        trust: "検討前に知りたいポイントを整理",
+        trust: "選ぶ前に魅力がひと目でわかる",
         limited: "気になった今がチェックのタイミング",
         short: `${name}を見る`,
         sns: "これ、ちょっと気になる",
-        comparison: "比べて選びやすいポイントを整理",
+        comparison: "自分に合うか見つけやすい",
         description: `${safeAudience}に向けて、特徴と選ぶ理由が伝わる画像用コピーを作ります。`,
       },
     };
@@ -915,13 +915,13 @@ export default function Home() {
     const adTypeCopy: Record<AdType, Partial<CopyBundle>> = {
       CV重視: {
         main: currentCampaignType === "商品販売" ? `${name}を選ぶ理由` : campaignCopy[currentCampaignType].main,
-        sub: "迷わず次の行動に進める案内",
-        trust: "初めてでも選びやすいポイントを整理",
+        sub: "次にやることがすぐわかる",
+        trust: "初めての方にも選ばれています",
         short: campaignCta,
       },
       CTR重視: {
         main: currentIndustry === "飲食" ? "今日ここ行かない？" : "これ、気になりませんか？",
-        sub: "思わず続きを見たくなる短い見出し",
+        sub: "気になって続きを見たくなる",
         short: "まずは見る",
         sns: "気になって保存したくなる",
       },
@@ -947,12 +947,12 @@ export default function Home() {
         short: "今すぐ見る",
       },
       BtoB: {
-        main: currentCampaignType === "資料請求" ? `${name}を資料で比較` : `${name}で業務を見直す`,
-        sub: "導入前に確認したい内容を整理",
-        benefit: "検討に必要な情報をまとめて確認できる",
+        main: currentCampaignType === "資料請求" ? `${name}を資料で確認` : `${name}で業務を見直す`,
+        sub: "導入前に全体像がつかめる",
+        benefit: "導入後のイメージが持ちやすい",
         problem: "属人的な運用を見直したい方へ",
         trust: "法人導入前に確認しやすい資料です",
-        comparison: "感覚ではなく資料で比較する",
+        comparison: "資料を見て納得して選ぶ",
       },
     };
 
@@ -966,7 +966,7 @@ export default function Home() {
             : currentCampaignType === "求人"
               ? "仕事内容と働きやすさがわかる"
               : currentCampaignType === "資料請求"
-                ? "導入前の比較ポイントがわかる"
+                ? "導入前に全体像がつかめる"
                 : "今チェックしたい理由がすぐにわかる",
       },
       自然: {
@@ -1003,8 +1003,8 @@ export default function Home() {
         sub: "Instagramになじむ自然なひとこと",
       },
       BtoB: {
-        main: currentCampaignType === "資料請求" ? `${name}を資料で比較` : `${name}で業務を見直す`,
-        sub: "導入前に確認したい内容を整理",
+        main: currentCampaignType === "資料請求" ? `${name}を資料で確認` : `${name}で業務を見直す`,
+        sub: "導入前に全体像がつかめる",
       },
     };
 
@@ -1166,7 +1166,7 @@ export default function Home() {
       return [
         "求職中・転職検討中のユーザー",
         "勤務地・給与・働きやすさ・未経験可を重視",
-        "応募前の不安を減らす情報に反応しやすい",
+        "応募前の不安を減らす内容に反応しやすい",
       ];
     }
 
@@ -1189,13 +1189,13 @@ export default function Home() {
     if (target.includes("女性")) {
       return [
         "25〜34歳女性",
-        "InstagramやTikTokで情報収集する傾向",
+        "InstagramやTikTokで比較検討する傾向",
         "口コミ、実例、Before/Afterに興味を持ちやすい",
       ];
     }
 
     return [
-      "SNSや検索で情報収集する一般ユーザー",
+      "SNSや検索で検討する一般ユーザー",
       "短時間で価値が伝わる広告に反応しやすい",
       "難しい説明より、直感的に価値が伝わる表現が有効",
     ];
@@ -1207,7 +1207,7 @@ export default function Home() {
     if (campaignType === "求人") hooks.push("安心感：未経験・働きやすさ・応募しやすさ");
     if (campaignType === "店舗集客") hooks.push("近さ・体験価値：行ってみたいと思わせる");
     if (campaignType === "商品販売") hooks.push("ベネフィット：使った後の変化を想像させる");
-    if (campaignType === "資料請求") hooks.push("信頼感：比較検討に必要な情報を提示");
+    if (campaignType === "資料請求") hooks.push("信頼感：判断しやすい材料を提示");
     if (appeal.includes("無料")) hooks.push("損失回避：無料なら試してみたい心理");
     if (appeal.includes("限定")) hooks.push("希少性：今だけ感による行動促進");
     if (appeal.includes("時短")) hooks.push("時短欲求：面倒を減らしたい心理");
@@ -1244,10 +1244,10 @@ export default function Home() {
     if (!ctaCopy.trim()) tips.push("CTAを入力すると、クリック行動を促しやすくなります。");
     tips.push(`文字数スコアは${copyLengthScore}点です。メイン12〜20文字、サブ20〜35文字、CTA4〜10文字を目安にしてください。`);
 
-    if (campaignType === "求人") tips.push("求人広告では、勤務地・給与・未経験可・シフト情報を入れると応募率が上がりやすいです。");
+    if (campaignType === "求人") tips.push("求人広告では、勤務地・給与・未経験可・シフト条件を入れると応募率が上がりやすいです。");
     if (campaignType === "店舗集客") tips.push("店舗集客では、地域名・口コミ・予約しやすさを入れると来店につながりやすいです。");
     if (campaignType === "商品販売") tips.push("商品広告では、商品写真を主役にして、使った後の変化を見せると効果的です。");
-    if (campaignType === "資料請求") tips.push("資料請求では、得られる情報・導入事例・実績を見せるとCVしやすくなります。");
+    if (campaignType === "資料請求") tips.push("資料請求では、資料でわかる内容・導入事例・実績を見せるとCVしやすくなります。");
 
     if (tips.length === 0) {
       tips.push("入力内容は十分具体的です。複数デザインでA/Bテストするのがおすすめです。");
@@ -1744,7 +1744,7 @@ ${finalCanvasSize} 相当の1枚のキャンバスに、${size} 相当の独立�
                         <Textarea label="限定コピー（今見る理由）" value={limitedCopy} onChange={(value) => { setLimitedCopy(value); setHasEditedCopy(true); }} />
                         <Textarea label="短尺コピー（小さな装飾文言）" value={shortCopy} onChange={(value) => { setShortCopy(value); setHasEditedCopy(true); }} />
                         <Textarea label="SNS風コピー（投稿風の一言）" value={snsCopy} onChange={(value) => { setSnsCopy(value); setHasEditedCopy(true); }} />
-                        <Textarea label="比較コピー（選ぶ理由）" value={comparisonCopy} onChange={(value) => { setComparisonCopy(value); setHasEditedCopy(true); }} />
+                        <Textarea label="選ぶ理由コピー（画像内の補足）" value={comparisonCopy} onChange={(value) => { setComparisonCopy(value); setHasEditedCopy(true); }} />
                         <div className="xl:col-span-2">
                           <Textarea label="長め説明コピー（生成プロンプト用の意図説明）" value={descriptionCopy} onChange={(value) => { setDescriptionCopy(value); setHasEditedCopy(true); }} />
                         </div>
@@ -1842,7 +1842,7 @@ ${finalCanvasSize} 相当の1枚のキャンバスに、${size} 相当の独立�
                     <div className={`rounded-xl p-5 ${softPanel}`}>
                       <h2 className="text-xl font-black">使い方</h2>
                       <p className="mt-2 text-sm font-medium leading-7 opacity-80">
-                        広告ジャンル、商品情報、コピー、デザインを選ぶだけで生成プロンプトを作成できます。
+                        広告ジャンル、商品内容、コピー、デザインを選ぶだけで生成プロンプトを作成できます。
                       </p>
                     </div>
 
@@ -1955,7 +1955,7 @@ function StepBar({
   selectedDesignCount: number;
 }) {
   const steps = [
-    { label: "情報入力", done: hasProduct },
+    { label: "内容入力", done: hasProduct },
     { label: "コピー作成", done: hasCopy },
     { label: "デザイン選択", done: selectedDesignCount > 0 },
     { label: "生成準備", done: qualityScore >= 70 },
